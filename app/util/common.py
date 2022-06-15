@@ -1,14 +1,12 @@
 import operator
+import os
 import pytz
 import re
 import time
 
+from slugify import slugify
 from datetime import datetime, timedelta
 from typing import Optional
-
-from app.dto.core.campaign import CampaignDTO
-from app.dto.pes.campaign import PESCampaignStatus
-from app.helper.enum import CampaignRunningStatus, PromotionEngine, VoucherStatus
 
 
 def compare(inp, relate, cut) -> bool:
@@ -120,43 +118,6 @@ def paginate(data, page, page_size):
     return paginated_data[page - 1], pagination
 
 
-def get_voucher_status(
-        promotion_engine: PromotionEngine,
-        pes_campaign_status: PESCampaignStatus = None,
-        pes_campaign_start_time: int = None,
-        pes_campaign_end_time: int = None,
-) -> VoucherStatus:
-    if promotion_engine == PromotionEngine.PES:
-        if pes_campaign_status is None:
-            raise ValueError('pes_campaign_status is required')
-        if pes_campaign_start_time is None:
-            raise ValueError('pes_campaign_start_time is required')
-        if pes_campaign_end_time is None:
-            raise ValueError('pes_campaign_end_time is required')
-
-        if pes_campaign_status in [
-            PESCampaignStatus.CAMPAIGN_STATUS_DRAFT,
-            PESCampaignStatus.CAMPAIGN_STATUS_WAITING_APPROVE,
-        ]:
-            return VoucherStatus.DRAFT
-        elif pes_campaign_status == PESCampaignStatus.CAMPAIGN_STATUS_LOCKED:
-            return VoucherStatus.LOCKED
-        elif pes_campaign_status == PESCampaignStatus.CAMPAIGN_STATUS_APPROVED:
-            if time.time() < pes_campaign_start_time:
-                return VoucherStatus.APPROVED
-            elif pes_campaign_start_time <= time.time() <= pes_campaign_end_time:
-                return VoucherStatus.ACTIVE
-            elif time.time() > pes_campaign_end_time:
-                return VoucherStatus.FINISHED
-        elif pes_campaign_status == PESCampaignStatus.CAMPAIGN_STATUS_REJECT_APPROVE:
-            return VoucherStatus.FINISHED
-        return VoucherStatus.UNKNOWN
-    elif promotion_engine == PromotionEngine.PPM:
-        return VoucherStatus.ACTIVE
-
-    raise ValueError('Unsupported promotion engine')
-
-
 def is_list(value: str):
     try:
         list_str = eval(value)
@@ -178,18 +139,6 @@ def parse_accept_language(accept_languages: str) -> str:
             if lang[:2] in ["vi", "en"]:
                 return lang[:2]
     return "vi"
-
-
-def get_campaign_running_status(campaign: CampaignDTO) -> CampaignRunningStatus:
-    if campaign.start_time and campaign.end_time:
-        if datetime.now().timestamp() < campaign.start_time:
-            return CampaignRunningStatus.BEFORE
-        elif datetime.now().timestamp() > campaign.end_time:
-            return CampaignRunningStatus.AFTER
-        else:
-            return CampaignRunningStatus.BETWEEN
-    
-    return CampaignRunningStatus.BEFORE
 
 
 def is_same_dict(dict1: dict, dict2: dict) -> bool:
@@ -217,3 +166,7 @@ def is_same_dict(dict1: dict, dict2: dict) -> bool:
                 return False
 
     return True
+
+
+def generate_unique_filename(filename: str):
+    return filename.split('.')[0] + '-' + str(round(time.time() * 1000)) + '.' + filename.split('.')[1]

@@ -14,7 +14,7 @@ class Setting(BaseSettings):
     SLOW_SQL_THRESHOLD_MS: int = os.getenv('SLOW_SQL_THRESHOLD', 20000)
     ENV: str = os.getenv('ENV', 'local')
     LOG_LEVEL: str = os.getenv('LOG_LEVEL', 'INFO')
-    PROJECT_TITLE: str = 'Marketing Automation Core'
+    PROJECT_TITLE: str = 'KLTN BE'
     SQLALCHEMY_DATABASE_URI: str = os.getenv('SQLALCHEMY_DATABASE_URI')
     SQLALCHEMY_DATABASE_URI_TEST: str = os.getenv('SQLALCHEMY_DATABASE_URI_TEST')
 
@@ -23,5 +23,8 @@ class Setting(BaseSettings):
     JAEGER_AGENT_HOST: str = os.getenv('JAEGER_HOST', "localhost")
     JAEGER_AGENT_PORT: int = os.getenv('JAEGER_PORT', 6831)
     JAEGER_SAMPLING_RATE: float = os.getenv('JAEGER_SAMPLING_RATE', 1 / 2)
+
+    # Data Storage
+    DATA_STORAGE: str = '../data/minio'
 
 setting = Setting()

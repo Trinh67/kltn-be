@@ -36,11 +36,11 @@ middleware = [
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title=setting.PROJECT_TITLE, docs_url='/core/docs',
+        title=setting.PROJECT_TITLE, docs_url='/kltn-be/docs',
         middleware=middleware
     )
 
-    app.add_middleware(PrometheusMiddleware, app_name="bff", exclude_paths=['/api/v1/health/check', '/metrics'])
+    app.add_middleware(PrometheusMiddleware, app_name="kltn-be", exclude_paths=['/api/v1/health/check', '/metrics'])
     app.add_route("/metrics", handle_metrics)
     app.include_router(api_router, prefix="/api")
 
@@ -58,7 +58,7 @@ def create_app() -> FastAPI:
         sampler = TraceIdRatioBased(setting.JAEGER_SAMPLING_RATE)
         trace.set_tracer_provider(
             TracerProvider(
-                resource=Resource.create({SERVICE_NAME: "Marketing Automation Core"}),
+                resource=Resource.create({SERVICE_NAME: "KLTN BE"}),
                 sampler=sampler
             )
         )

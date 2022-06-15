@@ -7,6 +7,14 @@ from app.helper.base_response import ResponseSchemaBase
 from app.helper.custom_exception import CommonException, InternalServerError, Message, translate_message
 
 
+class ValidateException(CommonException):
+
+    def __init__(self, code: int = None, message: object = None):
+        self.http_code = 400
+        self.code = code if code else self.http_code
+        self.message = message
+
+
 async def base_exception_handler(request: Request, exc: CommonException):
     return JSONResponse(
         status_code=exc.http_code,
