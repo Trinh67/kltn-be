@@ -12,6 +12,7 @@ class Setting(BaseSettings):
     ))
 
     SLOW_SQL_THRESHOLD_MS: int = os.getenv('SLOW_SQL_THRESHOLD', 20000)
+    SLOW_SERVICE_CALL_MS: int = os.getenv('SLOW_SERVICE_CALL_MS', 5000)
     ENV: str = os.getenv('ENV', 'local')
     LOG_LEVEL: str = os.getenv('LOG_LEVEL', 'INFO')
     PROJECT_TITLE: str = 'KLTN BE'
@@ -26,5 +27,6 @@ class Setting(BaseSettings):
 
     # Data Storage
     DATA_STORAGE: str = '../data/minio'
+    ELASTIC_SERVICE_API_BASE_URL: str = os.getenv('ELASTIC_SERVICE_API_BASE_URL', 'http://localhost:9200')
 
 setting = Setting()

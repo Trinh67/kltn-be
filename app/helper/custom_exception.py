@@ -101,6 +101,12 @@ class Unauthorized(CommonException):
                                                                   vi="Không được phép"))
 
 
+class ElasticServiceCallException(CommonException):
+    def __init__(self):
+        super().__init__(http_code=500, code=501, message=Message(en="Failed to call Elastic Service",
+                                                                  vi="Gọi sang Elastic thất bại"))
+
+
 def translate_message(field_name: str, lang: str) -> str:
     if data_mapping[lang].get(field_name):
         return data_mapping[lang][field_name]

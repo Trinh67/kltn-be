@@ -8,18 +8,27 @@ from app.helper.constant import Constant
 from app.helper.custom_exception import InvalidFileFormat
 
 
-class CreateUploadFileResponse(CamelBaseModel):
+class UploadFileResponse(CamelBaseModel):
     file_name: str = Field(alias="fileName")
 
 
-class CreateCustomerSetViaMinioRequest(CamelBaseModel):
+class CreateFileResponse(CamelBaseModel):
+    id: str
+
+
+class GetFileResponse(CamelBaseModel):
+    id: str
+    content: str
+
+
+class CreateFileRequest(CamelBaseModel):
     file_path: str
     user_id: int
 
     @validator('file_path')
     def validate_file_path(cls, value):
         name, ext = os.path.splitext(value)
-        if ext not in Constant.SUPPORTED_EXCEL_FILE_EXT:
+        if ext not in Constant.SUPPORTED_FILE_EXT:
             raise InvalidFileFormat
 
         return value
