@@ -9,7 +9,7 @@ from app.service import common_service
 from app.service.file import FileService
 from app.util.openapi import map_resp_to_openapi
 
-from app.dto.core.file import CreateFileRequest, CreateFileResponse, GetFileResponse, UploadFileResponse
+from app.dto.core.file import CreateFileRequest, CreateFileResponse, GetFileResponse, SearchFileRequest, SearchFileResponse, UploadFileResponse
 
 
 router = APIRouter()
@@ -43,5 +43,12 @@ def create_file(db: Session = Depends(db_session),
 @router.get('/', response_model=DataResponse[GetFileResponse])
 def get_file(id: str):
     data = FileService.get_file(id=id)
-    print(222222222)
+    return DataResponse().success_response(data=data)
+
+
+@router.post('/search', response_model=DataResponse[SearchFileResponse])
+def search_content_file(db: Session = Depends(db_session),
+                                  *,
+                                  request_input: SearchFileRequest):
+    data = FileService.search_content(request_input)
     return DataResponse().success_response(data=data)

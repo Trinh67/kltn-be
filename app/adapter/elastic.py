@@ -2,10 +2,11 @@ import logging
 import time
 from enum import Enum
 from http import HTTPStatus
+from pyparsing import Optional
 
 import requests
 from app.adapter.base import detect_slow_call
-from app.dto.elastic.file import GetFileResponse
+from app.dto.elastic.file import CreateFileResponse, GetFileResponse, SearchFileResponse
 from app.helper.custom_exception import ElasticServiceCallException
 from setting import setting
 
@@ -52,9 +53,68 @@ class ElasticService:
             raise ElasticServiceCallException('api get_file')
 
         raw_json = resp.json()
-        if resp.status_code == HTTPStatus.OK and raw_json.get('code') == ElasticServiceStatus.SUCCESS:
-            return GetFileResponse.parse_obj(
-                raw_json
-            )
+        if resp.status_code == HTTPStatus.OK:
+            data = dict()
+            data['id'] = raw_json.get('_id')
+            data['content'] = raw_json.get('_source').get('content')
+            return GetFileResponse.parse_obj(data)
 
         raise ElasticServiceCallException('api get_file')
+    
+    @classmethod
+    def search_content(cls, content: str, size: int = 5) -> SearchFileResponse:
+
+        try:
+            resp = cls.call(
+                method='GET',
+                url_path=f'/document/_search/',
+                json_data={
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                "match": {
+                                    "content": content
+                                }
+                                }
+                            ]
+                        }
+                    },
+                    "size": size
+                }
+            )
+        except Exception as e:
+            _logger.exception(e)
+            raise ElasticServiceCallException('api search_content')
+
+        raw_json = resp.json().get('hits')
+        if resp.status_code == HTTPStatus.OK:
+            data = dict()
+            data['total'] = raw_json.get('total').get('value')
+            data['files'] = [file.get('_id') for file in raw_json.get('hits')]
+            return SearchFileResponse.parse_obj(data)
+
+        raise ElasticServiceCallException('api search_content')
+    
+    @classmethod
+    def create_file(cls, content: str) -> CreateFileResponse:
+
+        try:
+            resp = cls.call(
+                method='POST',
+                url_path=f'/document/_doc/',
+                json_data={
+                    'content': content
+                }
+            )
+        except Exception as e:
+            _logger.exception(e)
+            raise ElasticServiceCallException('api create_file')
+
+        raw_json = resp.json()
+        if resp.status_code == HTTPStatus.CREATED:
+            data = dict()
+            data['id'] = raw_json.get('_id')
+            return CreateFileResponse.parse_obj(data)
+
+        raise ElasticServiceCallException('api create_file')

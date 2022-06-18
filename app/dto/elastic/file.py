@@ -1,15 +1,19 @@
 
+from typing import List
 from pydantic import Field
 
+from app.dto.base import CamelBaseModel
 
-class FileContent:
+
+class GetFileResponse(CamelBaseModel):
+    id: str
     content: str
 
 
-class GetFileResponse:
-    id: str = Field(alias='_id')
-    source: FileContent = Field(alias='_source')
-
-
-class CreateFileResponse:
+class CreateFileResponse(CamelBaseModel):
     id: str
+
+
+class SearchFileResponse(CamelBaseModel):
+    total: int
+    files: List[str]

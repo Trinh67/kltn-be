@@ -1,4 +1,5 @@
 import os
+from typing import List
 from pyparsing import Optional
 from app.dto.base import CamelBaseModel
 
@@ -32,3 +33,13 @@ class CreateFileRequest(CamelBaseModel):
             raise InvalidFileFormat
 
         return value
+
+
+class SearchFileResponse(CamelBaseModel):
+    total: int
+    files: List[str]
+
+
+class SearchFileRequest(CamelBaseModel):
+    content: str
+    size: int = Field(default=5)
