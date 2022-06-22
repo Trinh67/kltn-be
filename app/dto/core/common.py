@@ -24,8 +24,7 @@ class UploadFileRequest(UploadFileSource):
             raise ValidateException(402, Message(en = 'Param file is required', \
                                                  vi = 'Tệp bắt buộc nhập'))
         path = Path(v.filename)
-        if not path.name or path.suffix.lower() not in ['.jpg', '.png', 'svg', '.csv', '.xls', '.xlsx', '.pdf', '.txt',
-                                                        '.docs', '.doc', '.docx', '.pptx']:
+        if not path.name or path.suffix.lower() not in ['.csv', '.xls', '.xlsx', '.pdf', '.txt', '.docs', '.doc', '.docx', '.pptx']:
             raise ValidateException(415, Message(en = 'File type is not supported', \
                                                  vi = 'Định dạng tệp tải lên không được hỗ trợ'))
         return v

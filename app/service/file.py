@@ -29,7 +29,6 @@ class FileService:
                 for i in range(0, num_pages):
                     page = pdf.pages[i]
                     content += page.extract_text() + f'--- page {i} ----'
-                print(content)
                 data = ElasticService.create_file(content)
         else:
             raise InvalidFileException
