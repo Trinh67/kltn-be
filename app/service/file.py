@@ -36,8 +36,13 @@ class FileService:
         return data
     
     @classmethod
-    def get_file(cls, id: int):
+    def get_file(cls, id: str):
         data = ElasticService.get_file(id)
+        return data
+    
+    @classmethod
+    def get_list_file(cls, size: int):
+        data = ElasticService.get_list_file(size)
         return data
     
     @classmethod

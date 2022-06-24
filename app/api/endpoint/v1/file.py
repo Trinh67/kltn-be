@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 from fastapi import APIRouter, Depends, File, Form
 from sqlalchemy.orm import Session
 from app.dto.base import OpenApiResponseModel
@@ -9,7 +10,7 @@ from app.service import common_service
 from app.service.file import FileService
 from app.util.openapi import map_resp_to_openapi
 
-from app.dto.core.file import CreateFileRequest, CreateFileResponse, GetFileResponse, SearchFileRequest, SearchFileResponse, UploadFileResponse
+from app.dto.core.file import CreateFileRequest, CreateFileResponse, GetFileResponse, GetListFileResponse, SearchFileRequest, SearchFileResponse, UploadFileResponse
 
 
 router = APIRouter()
@@ -43,6 +44,12 @@ def create_file(db: Session = Depends(db_session),
 @router.get('/', response_model=DataResponse[GetFileResponse])
 def get_file(id: str):
     data = FileService.get_file(id=id)
+    return DataResponse().success_response(data=data)
+
+
+@router.get('/list-file', response_model=DataResponse[GetListFileResponse])
+def get_list_file(size: int = 5):
+    data = FileService.get_list_file(size = size)
     return DataResponse().success_response(data=data)
 
 

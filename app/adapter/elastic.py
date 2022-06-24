@@ -2,12 +2,14 @@ import logging
 import time
 from enum import Enum
 from http import HTTPStatus
+from typing import List
 from pyparsing import Optional
 
 import requests
 from app.adapter.base import detect_slow_call
 from app.dto.elastic.file import CreateFileResponse, GetFileResponse, SearchFileResponse
 from app.helper.custom_exception import ElasticServiceCallException
+from app.helper.paging import Pagination
 from setting import setting
 
 _logger = logging.getLogger(__name__)
@@ -41,7 +43,7 @@ class ElasticService:
             raise e
 
     @classmethod
-    def get_file(cls, id: int) -> GetFileResponse:
+    def get_file(cls, id: str) -> GetFileResponse:
 
         try:
             resp = cls.call(
@@ -58,6 +60,39 @@ class ElasticService:
             data['id'] = raw_json.get('_id')
             data['content'] = raw_json.get('_source').get('content')
             return GetFileResponse.parse_obj(data)
+
+        raise ElasticServiceCallException('api get_file')
+    
+    @classmethod
+    def get_list_file(cls, size: int):
+
+        try:
+            resp = cls.call(
+                method='GET',
+                url_path=f'/document/_search',
+                json_data={
+                    "size": size
+                }
+            )
+        except Exception as e:
+            _logger.exception(e)
+            raise ElasticServiceCallException('api get_file')
+
+        raw_json = resp.json().get('hits')
+        if resp.status_code == HTTPStatus.OK:
+            data = dict()
+            data['pagination'] = {
+                "total": raw_json.get('total').get('value'),
+                "size": size,
+            }
+            data['files'] = []
+            for file in raw_json.get('hits'):
+                file_detail = dict()
+                file_detail['id'] = file.get('_id')
+                file_detail['content'] = file.get('_source').get('content')
+                data['files'].append(file_detail)
+
+            return data
 
         raise ElasticServiceCallException('api get_file')
     

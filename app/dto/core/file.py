@@ -22,6 +22,16 @@ class GetFileResponse(CamelBaseModel):
     content: str
 
 
+class ElasticPagination(CamelBaseModel):
+    total: int
+    size: int
+
+
+class GetListFileResponse(CamelBaseModel):
+    files: List[GetFileResponse]
+    pagination: ElasticPagination
+
+
 class CreateFileRequest(CamelBaseModel):
     file_path: str
     user_id: int
