@@ -33,16 +33,21 @@ class GetListFileResponse(CamelBaseModel):
 
 
 class CreateFileRequest(CamelBaseModel):
-    file_path: str
+    file_name: str
+    category_id: int
     user_id: int
 
-    @validator('file_path')
+    @validator('file_name')
     def validate_file_path(cls, value):
         name, ext = os.path.splitext(value)
         if ext not in Constant.SUPPORTED_FILE_EXT:
             raise InvalidFileFormat
 
         return value
+
+
+class CreateFileResponse(CamelBaseModel):
+    new_file_id: int
 
 
 class SearchFileResponse(CamelBaseModel):

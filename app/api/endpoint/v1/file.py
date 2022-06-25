@@ -37,7 +37,7 @@ def upload_document_file(*, upload_file_request: UploadFileRequest = File(...), 
 def create_file(db: Session = Depends(db_session),
                                   *,
                                   request_input: CreateFileRequest):
-    data = FileService.create_file(request_input=request_input)
+    data = FileService.create_file(db, request_input=request_input)
     return DataResponse().success_response(data=data)
 
 
