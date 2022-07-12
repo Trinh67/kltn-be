@@ -1,7 +1,10 @@
 import logging
+from typing import Optional
+from sqlalchemy import and_, desc
 from sqlalchemy.orm import Session
 from app.adapter.elastic import ElasticService
 from app.dto.core.file import GetFileResponse, GetListFileResponse
+from app.helper.paging import Pagination
 from app.model.file import File
 
 from setting import setting
@@ -17,11 +20,17 @@ class FileService:
         return GetFileResponse(**file.to_dict())
     
     @classmethod
-    def get_list_file(cls, db: Session, user_id: int):
-        files = File.q(db, File.user_id == user_id).all()
+    def get_list_file(cls, db: Session, user_id: Optional[int]):
+        if user_id:
+            files = File.q(db, and_(File.user_id == user_id, File.deleted_at.is_(None))) \
+                        .order_by(desc(File.id)).all()
+        else:
+            files = File.q(db, File.deleted_at.is_(None)).order_by(desc(File.id)).all()
+
+        total_files = len(files)
         dto_files = []
         for file in files:
             dto_file = GetFileResponse(**file.to_dict())
             dto_files.append(dto_file)
         
-        return GetListFileResponse(files=dto_files)
+        return GetListFileResponse(files=dto_files), Pagination(total_items=total_files, current_page=1, page_size=100)

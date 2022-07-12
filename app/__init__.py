@@ -21,6 +21,7 @@ from opentelemetry.sdk.trace.sampling import TraceIdRatioBased
 from starlette.middleware import Middleware
 from starlette_context.middleware import ContextMiddleware
 from starlette.requests import Request
+from fastapi.middleware.cors import CORSMiddleware
 
 
 class GetLanguageMiddleware(ContextMiddleware):
@@ -45,14 +46,13 @@ def create_app() -> FastAPI:
     app.include_router(api_router, prefix="/api")
 
     # Set all CORS enabled origins
-    # if setting.BACKEND_CORS_ORIGINS:
-    #     app.add_middleware(
-    #         CORSMiddleware,
-    #         allow_origins=[str(origin) for origin in setting.BACKEND_CORS_ORIGINS],
-    #         allow_credentials=True,
-    #         allow_methods=["*"],
-    #         allow_headers=["*"],
-    #     )
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     if setting.JAEGER_ENABLED:
         sampler = TraceIdRatioBased(setting.JAEGER_SAMPLING_RATE)
