@@ -6,7 +6,7 @@ from app.dto.base import CamelBaseModel
 from app.dto.core.pagination import PaginationResponse
 
 
-class GetFileResponse(CamelBaseModel):
+class FileDTO(CamelBaseModel):
     class Config:
         orm_mode = True
 
@@ -14,6 +14,7 @@ class GetFileResponse(CamelBaseModel):
     file_name: str
     category_id: int
     file_description: str
+    pages: int
     views: int
     downloads: int
     updated_at: Union[int, datetime]
@@ -25,6 +26,10 @@ class GetFileResponse(CamelBaseModel):
             values['type'] = values.get('file_name').split('.')[1]
 
         return values
+
+
+class GetFileResponse(FileDTO):
+    author_name: Optional[str]
 
 
 class GetListFileResponse(PaginationResponse):

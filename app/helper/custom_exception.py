@@ -36,15 +36,15 @@ class ExistedException(CommonException):
 
 
 class ObjectNotFound(CommonException):
-    def __init__(self, obj: object = None):
-        super().__init__(http_code=400, code=404, message=Message(en=f"{obj.value} not found",
-                                                                  vi=f"{translate_message(obj.value, 'vi')} không tồn tại"))
+    def __init__(self, obj: object = str):
+        super().__init__(http_code=400, code=404, message=Message(en=f"{obj} not found",
+                                                                  vi=f"{translate_message(obj, 'vi')} không tồn tại"))
 
 
 class URLNotFound(CommonException):
-    def __init__(self, obj: object = None):
-        super().__init__(http_code=404, code=404, message=Message(en=f"{obj.value} not found",
-                                                                  vi=f"{translate_message(obj.value, 'vi')} không tồn tại"))
+    def __init__(self, obj: object = str):
+        super().__init__(http_code=404, code=404, message=Message(en=f"{obj} not found",
+                                                                  vi=f"{translate_message(obj, 'vi')} không tồn tại"))
 
 
 class InternalServerError(CommonException):
