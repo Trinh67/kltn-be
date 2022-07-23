@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, File, Form
 from sqlalchemy.orm import Session
 from app.dto.core.common import UploadFileRequest
-from app.dto.core.file import GetFileResponse, GetListFileResponse
+from app.dto.core.file import GetFileDBResponse, GetListFileResponse
 from app.helper.base_response import DataResponse, PagingDataResponse
 from app.helper.db import db_session
 from app.service.file import FileService
@@ -16,7 +16,7 @@ router = APIRouter()
 _logger = logging.getLogger(__name__)
 
 
-@router.get('/', response_model=DataResponse[GetFileResponse])
+@router.get('/', response_model=DataResponse[GetFileDBResponse])
 def get_file(db: Session = Depends(db_session),
                                   *, id: int):
     data = FileService.get_file(db, id=id)

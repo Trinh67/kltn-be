@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 from app.config.field_name_mapping import data_mapping
 
@@ -102,9 +103,9 @@ class Unauthorized(CommonException):
 
 
 class ElasticServiceCallException(CommonException):
-    def __init__(self):
-        super().__init__(http_code=500, code=501, message=Message(en="Failed to call Elastic Service",
-                                                                  vi="Gọi sang Elastic thất bại"))
+    def __init__(self, api_url: Optional[str]):
+        super().__init__(http_code=500, code=501, message=Message(en=f"Failed to call Elastic Service {api_url}",
+                                                                  vi=f"Gọi sang Elastic {api_url} thất bại"))
 
 
 def translate_message(field_name: str, lang: str) -> str:

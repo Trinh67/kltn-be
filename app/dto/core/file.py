@@ -28,9 +28,13 @@ class FileDTO(CamelBaseModel):
         return values
 
 
-class GetFileResponse(FileDTO):
+class GetFileDBResponse(FileDTO):
     author_name: Optional[str]
 
 
 class GetListFileResponse(PaginationResponse):
-    files: List[GetFileResponse]
+    files: List[GetFileDBResponse]
+
+
+class SearchFileMappingResponse(PaginationResponse):
+    files: List[GetFileDBResponse]

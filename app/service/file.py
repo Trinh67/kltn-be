@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy import and_, desc
 from sqlalchemy.orm import Session
 from app.adapter.elastic import ElasticService
-from app.dto.core.file import GetFileResponse, GetListFileResponse
+from app.dto.core.file import GetFileDBResponse, GetListFileResponse
 from app.helper.custom_exception import ObjectNotFound
 from app.helper.paging import Pagination
 from app.model.file import File
@@ -20,7 +20,7 @@ class FileService:
         file = File.q(db, and_(File.id == id, File.deleted_at.is_(None))).join(File.users).first()
         if not file:
             raise ObjectNotFound("File")
-        return GetFileResponse(**file.to_dict(), author_name=file.users.name)
+        return GetFileDBResponse(**file.to_dict(), author_name=file.users.name)
     
     @classmethod
     def get_list_file(cls, db: Session, user_id: Optional[int]):
@@ -37,7 +37,7 @@ class FileService:
         total_files = len(files)
         dto_files = []
         for file in files:
-            dto_file = GetFileResponse(**file.to_dict(), author_name=file.users.name)
+            dto_file = GetFileDBResponse(**file.to_dict(), author_name=file.users.name)
             dto_files.append(dto_file)
         
         return GetListFileResponse(files=dto_files), Pagination(total_items=total_files, current_page=1, page_size=100)

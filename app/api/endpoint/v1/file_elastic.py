@@ -4,13 +4,14 @@ from fastapi import APIRouter, Depends, File, Form
 from sqlalchemy.orm import Session
 from app.dto.base import OpenApiResponseModel
 from app.dto.core.common import UploadFileRequest
-from app.helper.base_response import DataResponse
+from app.dto.core.file import SearchFileMappingResponse
+from app.helper.base_response import DataResponse, PagingDataResponse
 from app.helper.db import db_session
 from app.service import common_service
 from app.service.file_elastic import FileElasticService
 from app.util.openapi import map_resp_to_openapi
 
-from app.dto.core.file_elastic import CreateFileRequest, CreateFileResponse, GetFileResponse, GetListFileResponse, SearchFileRequest, SearchFileResponse, UploadFileResponse
+from app.dto.core.file_elastic import CreateFileRequest, CreateFileResponse, GetFileResponse, GetListFileResponse, SearchFileRequest, UploadFileResponse
 
 
 router = APIRouter()
@@ -53,9 +54,9 @@ def get_list_file(size: int = 5):
     return DataResponse().success_response(data=data)
 
 
-@router.post('/search', response_model=DataResponse[SearchFileResponse])
+@router.post('/search', response_model=DataResponse[SearchFileMappingResponse])
 def search_content_file(db: Session = Depends(db_session),
                                   *,
                                   request_input: SearchFileRequest):
-    data = FileElasticService.search_content(request_input)
-    return DataResponse().success_response(data=data)
+    data, pagination = FileElasticService.search_content(db, request_input)
+    return PagingDataResponse().success_response(data=data, pagination=pagination)
