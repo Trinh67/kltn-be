@@ -1,7 +1,7 @@
 import logging
-import docx
 import docx2txt
 import pdfplumber
+from docx2pdf import convert
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from app.adapter.elastic import ElasticService
@@ -27,8 +27,10 @@ class FileElasticService:
         try:
             if request_input.file_name.split('.')[1] in Constant.DOCX_FILE_EXT:
                 # extract text from docx
-                doc = docx.Document(file_path)
-                num_pages = len(doc.paragraphs)
+                pdf_file = f'{DATA_PATH}/convert/output.pdf'
+                convert(file_path, pdf_file)
+                with pdfplumber.open(pdf_file) as pdf:
+                    num_pages = len(pdf.pages)
                 content = docx2txt.process(file_path)
                 data = ElasticService.create_file(content)
             elif request_input.file_name.split('.')[1] in Constant.PDF_FILE_EXT:
@@ -46,6 +48,8 @@ class FileElasticService:
             request_model_dict = {
                 "user_id": request_input.user_id,
                 "file_name": request_input.file_name,
+                "file_title": request_input.file_title,
+                "file_description": request_input.file_description,
                 "category_id": request_input.category_id,
                 "file_elastic_id": data.id,
                 "pages": num_pages
