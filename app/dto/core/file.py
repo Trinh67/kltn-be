@@ -12,6 +12,7 @@ class FileDTO(CamelBaseModel):
 
     id: int
     file_name: str
+    file_title: str
     category_id: int
     file_description: str
     pages: int

@@ -1,5 +1,5 @@
 import logging
-from plistlib import InvalidFileException
+import docx
 import docx2txt
 import pdfplumber
 from sqlalchemy import and_
@@ -9,7 +9,7 @@ from app.dto.core.file import GetFileDBResponse, SearchFileMappingResponse
 
 from app.dto.core.file_elastic import CreateFileRequest, CreateFileResponse, SearchFileRequest
 from app.helper.constant import Constant
-from app.helper.custom_exception import ElasticServiceCallException
+from app.helper.custom_exception import ElasticServiceCallException, InvalidFileFormat
 from app.helper.paging import Pagination
 from app.model.file import File
 from setting import setting
@@ -22,10 +22,13 @@ class FileElasticService:
     @classmethod
     def create_file(cls, db: Session, request_input: CreateFileRequest):
         file_path = f'{DATA_PATH}/{request_input.user_id}/{request_input.file_name}'
+        num_pages = 0
 
         try:
             if request_input.file_name.split('.')[1] in Constant.DOCX_FILE_EXT:
                 # extract text from docx
+                doc = docx.Document(file_path)
+                num_pages = len(doc.paragraphs)
                 content = docx2txt.process(file_path)
                 data = ElasticService.create_file(content)
             elif request_input.file_name.split('.')[1] in Constant.PDF_FILE_EXT:
@@ -38,13 +41,14 @@ class FileElasticService:
                         content += page.extract_text() + f'--- page {i} ----'
                     data = ElasticService.create_file(content)
             else:
-                raise InvalidFileException
+                raise InvalidFileFormat
             
             request_model_dict = {
                 "user_id": request_input.user_id,
                 "file_name": request_input.file_name,
                 "category_id": request_input.category_id,
-                "file_elastic_id": data.id
+                "file_elastic_id": data.id,
+                "pages": num_pages
             }
             new_file = File.create(db, request_model_dict)
             db.commit()

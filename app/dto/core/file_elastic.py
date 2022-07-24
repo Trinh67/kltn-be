@@ -34,6 +34,8 @@ class GetListFileResponse(CamelBaseModel):
 
 class CreateFileRequest(CamelBaseModel):
     file_name: str
+    file_title: str
+    file_description: str
     category_id: int
     user_id: int
 
