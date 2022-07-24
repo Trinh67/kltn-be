@@ -11,7 +11,6 @@ class FileDTO(CamelBaseModel):
         orm_mode = True
 
     id: int
-    file_name: str
     file_title: str
     category_id: int
     file_description: str
@@ -31,6 +30,7 @@ class FileDTO(CamelBaseModel):
 
 class GetFileDBResponse(FileDTO):
     author_name: Optional[str]
+    file_path: str
 
 
 class GetListFileResponse(PaginationResponse):

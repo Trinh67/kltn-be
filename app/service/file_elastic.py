@@ -83,6 +83,7 @@ class FileElasticService:
         total_files = len(files)
         dto_files = []
         for file in files:
-            dto_file = GetFileDBResponse(**file.to_dict(), author_name=file.users.name)
+            file_path = f"{file.user_id}/{file.file_name}"
+            dto_file = GetFileDBResponse(**file.to_dict(), file_path=file_path, author_name=file.users.name)
             dto_files.append(dto_file)
         return SearchFileMappingResponse(files=dto_files), Pagination(total_items=total_files, current_page=1, page_size=100)
