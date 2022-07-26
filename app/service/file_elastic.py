@@ -21,11 +21,11 @@ DATA_PATH = setting.DATA_STORAGE
 class FileElasticService:
     @classmethod
     def create_file(cls, db: Session, request_input: CreateFileRequest):
-        file_path = f'{DATA_PATH}/{request_input.user_id}/{request_input.file_name}'
+        file_path = f'{DATA_PATH}/{request_input.user_id}/{request_input.file_path}'
         num_pages = 0
 
         try:
-            if request_input.file_name.split('.')[1] in Constant.DOCX_FILE_EXT:
+            if request_input.file_path.split('.')[1] in Constant.DOCX_FILE_EXT:
                 # extract text from docx
                 pdf_file = f'{DATA_PATH}/convert/output.pdf'
                 convert(file_path, pdf_file)
@@ -33,7 +33,7 @@ class FileElasticService:
                     num_pages = len(pdf.pages)
                 content = docx2txt.process(file_path)
                 data = ElasticService.create_file(content)
-            elif request_input.file_name.split('.')[1] in Constant.PDF_FILE_EXT:
+            elif request_input.file_path.split('.')[1] in Constant.PDF_FILE_EXT:
                 # extract text from pdf
                 with pdfplumber.open(file_path) as pdf:
                     num_pages = len(pdf.pages)
@@ -47,7 +47,7 @@ class FileElasticService:
             
             request_model_dict = {
                 "user_id": request_input.user_id,
-                "file_name": request_input.file_name,
+                "file_name": request_input.file_path,
                 "file_title": request_input.file_title,
                 "file_description": request_input.file_description,
                 "category_id": request_input.category_id,

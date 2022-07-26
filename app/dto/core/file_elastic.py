@@ -33,13 +33,13 @@ class GetListFileResponse(CamelBaseModel):
 
 
 class CreateFileRequest(CamelBaseModel):
-    file_name: str
+    file_path: str
     file_title: str
     file_description: str
     category_id: int
     user_id: int
 
-    @validator('file_name')
+    @validator('file_path')
     def validate_file_path(cls, value):
         name, ext = os.path.splitext(value)
         if ext not in Constant.SUPPORTED_FILE_EXT:
