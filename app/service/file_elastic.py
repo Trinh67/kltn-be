@@ -76,14 +76,16 @@ class FileElasticService:
     @classmethod
     def search_content(cls, db: Session, request_input: SearchFileRequest):
         filter_ids = ElasticService.search_content(request_input.content, request_input.size).files
-        print(filter_ids)
         files = File.q(db, and_(File.file_elastic_id.in_(filter_ids), File.deleted_at.is_(None))) \
                     .join(File.users) \
                     .all()
         total_files = len(files)
         dto_files = []
-        for file in files:
-            file_path = f"{file.user_id}/{file.file_name}"
-            dto_file = GetFileDBResponse(**file.to_dict(), file_path=file_path, author_name=file.users.name)
-            dto_files.append(dto_file)
+        for id in filter_ids:
+            for file in files:
+                if file.file_elastic_id == id:
+                    file_path = f"{file.user_id}/{file.file_name}"
+                    dto_file = GetFileDBResponse(**file.to_dict(), file_path=file_path, author_name=file.users.name)
+                    dto_files.append(dto_file)
+                    break
         return SearchFileMappingResponse(files=dto_files), Pagination(total_items=total_files, current_page=1, page_size=100)
