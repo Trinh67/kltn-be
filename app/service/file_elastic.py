@@ -28,10 +28,10 @@ class FileElasticService:
         try:
             if request_input.file_path.split('.')[1] in Constant.DOCX_FILE_EXT:
                 # extract text from docx
-                pdf_file = f'{DATA_PATH}/convert/output.pdf'
-                convert(file_path, pdf_file)
-                with pdfplumber.open(pdf_file) as pdf:
-                    num_pages = len(pdf.pages)
+                # pdf_file = f'{DATA_PATH}/convert/output.pdf'
+                # convert(file_path, pdf_file)
+                # with pdfplumber.open(pdf_file) as pdf:
+                #     num_pages = len(pdf.pages)
                 content = docx2txt.process(file_path)
                 data = ElasticService.create_file(content)
             elif request_input.file_path.split('.')[1] in Constant.PDF_FILE_EXT:
