@@ -21,8 +21,6 @@ _logger = logging.getLogger(__name__)
              responses=map_resp_to_openapi([
                  OpenApiResponseModel(code=402, message='Param {param} is required', http_code='400',
                                       description='Missing required param'),
-                 OpenApiResponseModel(code=404, message='{Object} not found', http_code='400',
-                                      description='Object not found eg: campaign'),
                  OpenApiResponseModel(code=417, message='{param} format is invalid', http_code='400',
                                       description='File path format is invalid'),
              ]))

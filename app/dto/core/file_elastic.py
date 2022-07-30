@@ -1,9 +1,8 @@
 import os
-from typing import List
-from pyparsing import Optional
+from typing import List, Optional
 from app.dto.base import CamelBaseModel
 
-from pydantic import root_validator, validator, Field
+from pydantic import validator, Field
 from app.helper.constant import Constant
 
 from app.helper.custom_exception import InvalidFileFormat
@@ -33,7 +32,7 @@ class CreateFileRequest(CamelBaseModel):
     file_title: str
     file_description: str
     category_id: int
-    user_id: int
+    user_id: Optional[int] = 3
 
     @validator('file_path')
     def validate_file_path(cls, value):

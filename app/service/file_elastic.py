@@ -10,7 +10,7 @@ from app.dto.core.file import GetFileDBResponse, SearchFileMappingResponse
 
 from app.dto.core.file_elastic import CreateFileRequest, CreateFileResponse, SearchFileRequest
 from app.helper.constant import Constant
-from app.helper.custom_exception import ElasticServiceCallException, InvalidFileFormat
+from app.helper.custom_exception import ElasticServiceCallException, InvalidFileFormat, ObjectNotFound
 from app.helper.paging import Pagination
 from app.model.file import File
 from setting import setting
@@ -59,7 +59,7 @@ class FileElasticService:
             db.commit()
         except Exception as e:
             _logger.exception(e)
-            return Exception(f'Failed to create file')
+            raise ObjectNotFound(request_input.file_path)
 
 
         return CreateFileResponse(new_file_id = new_file.id)
