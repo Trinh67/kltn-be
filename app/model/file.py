@@ -1,5 +1,4 @@
-from email.policy import default
-from sqlalchemy import Column, Integer, String, Text, null
+from sqlalchemy import Column, Integer, String, Text
 
 from app.model.base import BareBaseModel
 from sqlalchemy.orm import relationship
@@ -21,5 +20,9 @@ class File(BareBaseModel):
     #relationship
     users = relationship("User", foreign_keys='File.user_id',
                          primaryjoin='and_(File.user_id == User.user_id, User.deleted_at.is_(None))',
+                         back_populates="files",
+                         uselist=False, lazy='select')
+    categories = relationship("Category", foreign_keys='File.category_id',
+                         primaryjoin='and_(File.category_id == Category.id, Category.deleted_at.is_(None))',
                          back_populates="files",
                          uselist=False, lazy='select')

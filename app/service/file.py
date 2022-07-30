@@ -20,7 +20,9 @@ class FileService:
         file = File.q(db, and_(File.id == id, File.deleted_at.is_(None))).join(File.users).first()
         if not file:
             raise ObjectNotFound("File")
-        return GetFileDBResponse(**file.to_dict(), author_name=file.users.name)
+        file_path = f"{file.user_id}/{file.file_name}"
+        return GetFileDBResponse(**file.to_dict(), author_name=file.users.name, file_path=file_path, \
+                                 category_vi=file.categories.name_vi, category_en=file.categories.name_en)
     
     @classmethod
     def get_list_file(cls, db: Session, user_id: Optional[int]):
@@ -38,7 +40,8 @@ class FileService:
         dto_files = []
         for file in files:
             file_path = f"{file.user_id}/{file.file_name}"
-            dto_file = GetFileDBResponse(**file.to_dict(), file_path=file_path, author_name=file.users.name)
+            dto_file = GetFileDBResponse(**file.to_dict(), file_path=file_path, author_name=file.users.name, \
+                                         category_vi=file.categories.name_vi, category_en=file.categories.name_en)
             dto_files.append(dto_file)
         
         return GetListFileResponse(files=dto_files), Pagination(total_items=total_files, current_page=1, page_size=100)

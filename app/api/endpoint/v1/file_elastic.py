@@ -1,28 +1,19 @@
 import logging
-from typing import Optional
-from fastapi import APIRouter, Depends, File, Form
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.dto.base import OpenApiResponseModel
-from app.dto.core.common import UploadFileRequest
 from app.dto.core.file import SearchFileMappingResponse
 from app.helper.base_response import DataResponse, PagingDataResponse
 from app.helper.db import db_session
-from app.service import common_service
 from app.service.file_elastic import FileElasticService
 from app.util.openapi import map_resp_to_openapi
 
-from app.dto.core.file_elastic import CreateFileRequest, CreateFileResponse, GetFileResponse, GetListFileResponse, SearchFileRequest, UploadFileResponse
+from app.dto.core.file_elastic import CreateFileRequest, CreateFileResponse, GetFileResponse, GetListFileResponse, SearchFileRequest
 
 
 router = APIRouter()
 
 _logger = logging.getLogger(__name__)
-
-
-@router.post('/upload-file', response_model=DataResponse[UploadFileResponse])
-def upload_document_file(*, upload_file_request: UploadFileRequest = File(...), user_id: int = Form(..., alias='userId')):
-    data = common_service.upload_file(user_id=user_id ,file=upload_file_request)
-    return DataResponse().success_response(data=data)
 
 
 @router.post("/", response_model=DataResponse[CreateFileResponse],

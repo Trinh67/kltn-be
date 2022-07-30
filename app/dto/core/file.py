@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List, Optional, Union
+from unicodedata import category
 
 from pydantic import Field, root_validator
 from app.dto.base import CamelBaseModel
@@ -12,7 +13,7 @@ class FileDTO(CamelBaseModel):
 
     id: int
     file_title: str
-    file_path: str
+    file_name: str
     category_id: int
     file_description: str
     pages: int
@@ -23,14 +24,17 @@ class FileDTO(CamelBaseModel):
 
     @root_validator()
     def validate_duration(cls, values):
-        if values.get('file_path'):
-            values['type'] = values.get('file_path').split('.')[1]
+        if values.get('file_name'):
+            values['type'] = values.get('file_name').split('.')[1]
 
         return values
 
 
 class GetFileDBResponse(FileDTO):
     author_name: Optional[str]
+    file_path: str
+    category_vi: str
+    category_en: str
 
 
 class GetListFileResponse(PaginationResponse):
@@ -39,3 +43,7 @@ class GetListFileResponse(PaginationResponse):
 
 class SearchFileMappingResponse(PaginationResponse):
     files: List[GetFileDBResponse]
+
+
+class UploadFileResponse(CamelBaseModel):
+    file_name: str = Field(alias="fileName")

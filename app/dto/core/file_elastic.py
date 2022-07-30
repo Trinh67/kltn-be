@@ -9,10 +9,6 @@ from app.helper.constant import Constant
 from app.helper.custom_exception import InvalidFileFormat
 
 
-class UploadFileResponse(CamelBaseModel):
-    file_name: str = Field(alias="fileName")
-
-
 class CreateFileResponse(CamelBaseModel):
     id: str
 

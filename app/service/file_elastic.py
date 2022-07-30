@@ -1,4 +1,5 @@
 import logging
+from unicodedata import category
 import docx2txt
 import pdfplumber
 from docx2pdf import convert
@@ -85,7 +86,8 @@ class FileElasticService:
             for file in files:
                 if file.file_elastic_id == id:
                     file_path = f"{file.user_id}/{file.file_name}"
-                    dto_file = GetFileDBResponse(**file.to_dict(), file_path=file_path, author_name=file.users.name)
+                    dto_file = GetFileDBResponse(**file.to_dict(), file_path=file_path, author_name=file.users.name, \
+                                                 category_vi=file.categories.name_vi, category_en=file.categories.name_en)
                     dto_files.append(dto_file)
                     break
         return SearchFileMappingResponse(files=dto_files), Pagination(total_items=total_files, current_page=1, page_size=100)
