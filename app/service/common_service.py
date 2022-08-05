@@ -10,6 +10,9 @@ from app.util.common import generate_unique_filename
 from setting import setting
 
 _logger = logging.getLogger(__name__)
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+
 
 DATA_PATH = setting.DATA_STORAGE
 
@@ -31,6 +34,14 @@ def upload_file(user_id, file):
                                                  vi = 'Tên tệp đã tồn tại'))
         with open(file_path, 'wb') as buffer:
             shutil.copyfileobj(file.file, buffer)
+        
+        gauth = GoogleAuth()           
+        drive = GoogleDrive(gauth)
+        
+        gfile = drive.CreateFile({'parents': [{'id': '1fvoaIr_M33cC5h5LHUjX_sIlQkJdQvfL'}], 'title': file_name})
+        # Read file and set it as the content of this instance.
+        gfile.SetContentFile(file_path)
+        gfile.Upload() # Upload the file.
 
         return {"file_name": file_name}
     except CommonException as e:
