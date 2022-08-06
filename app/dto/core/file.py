@@ -21,6 +21,7 @@ class FileDTO(CamelBaseModel):
     downloads: int
     updated_at: Union[int, datetime]
     type: Optional[str]
+    google_driver_id: Optional[str]
 
     @root_validator()
     def validate_duration(cls, values):
