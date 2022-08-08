@@ -96,10 +96,10 @@ class PermissionDenied(CommonException):
                                                                   vi="Không có quyền truy cập"))
 
 
-class Unauthorized(CommonException):
+class UnauthorizedException(CommonException):
     def __init__(self):
-        super().__init__(http_code=401, code=401, message=Message(en="Unauthorized",
-                                                                  vi="Không được phép"))
+        super().__init__(http_code=401, code=401, message=Message(en=f"Unauthorized user",
+                                                                  vi=f"Người dùng chưa đăng nhập"))
 
 
 class ElasticServiceCallException(CommonException):

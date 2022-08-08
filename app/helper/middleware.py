@@ -1,22 +1,39 @@
+import logging
 from typing import Optional
 
-from fastapi import Request
-from humps import camelize
+from fastapi import Depends
+from fastapi.security import APIKeyHeader, HTTPBearer
+from fastapi.security.utils import get_authorization_scheme_param
+from sqlalchemy.orm import Session
+
+from app.dto.core.auth import UserDTO
+from app.helper.custom_exception import UnauthorizedException
+from app.helper.db import db_session
+from app.helper.jwt import TokenData, get_pay_load
+from app.model import User
+
+LOGGING_METHOD = ['POST', 'PUT', 'DELETE']
+HEALTH_CHECK_API = 'health/check'
+
+_logger = logging.getLogger(__name__)
+authorize_header = APIKeyHeader(name='authorization', auto_error=False)
 
 
-async def get_action_by_from_request(request: Request) -> Optional[str]:
-    if request.method in ['POST', 'PUT', 'PATCH']:
-        request_body = await request.json()
-        user = request_body.get(camelize('action_by'))
-        if not user:
-            user = request_body.get(camelize('created_by'))
+def get_current_user(
+        access_token: Optional[str] = Depends(authorize_header),
+        db: Session = Depends(db_session)
+) -> Optional[UserDTO]:
+    scheme, token = get_authorization_scheme_param(access_token)
+    if scheme.lower() != "bearer":
+        raise UnauthorizedException
 
-        return user
-    elif request.method == 'DELETE':
-        user = request.query_params.get(camelize('deleted_by'))
-        # if not user:
-        #     request_body = await request.json()
-        #     user = request_body.get(camelize('action_by'))
+    token_data = TokenData(**get_pay_load(token))
 
-        return user
-    return None
+    user = User.q(db, User.email == token_data.sub).first()
+
+    if not user:
+        raise UnauthorizedException
+
+    result = UserDTO.from_orm(user)
+
+    return result

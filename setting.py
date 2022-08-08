@@ -1,5 +1,6 @@
 import os
 import json
+from telnetlib import AUTHENTICATION
 from dotenv import load_dotenv
 from pydantic import BaseSettings
 
@@ -28,5 +29,12 @@ class Setting(BaseSettings):
     # Data Storage
     DATA_STORAGE: str = '../data/minio'
     ELASTIC_SERVICE_API_BASE_URL: str = os.getenv('ELASTIC_SERVICE_API_BASE_URL', 'http://localhost:9200')
+
+    # AUTHENTICATION
+    JWT_ALGORITHM: str = "HS256"
+    JWT_SECRET_KEY: str = os.getenv('JWT_SECRET_KEY')
+    GOOGLE_CLIENT_ID: str = os.getenv('GOOGLE_CLIENT_ID')
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 12 * 60 * 7
+    REFRESH_TOKEN_EXPIRE_MINUTES: int = 24 * 60 * 7
 
 setting = Setting()

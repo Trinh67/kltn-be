@@ -9,6 +9,8 @@ class User(BareBaseModel):
 
     name = Column(String(50), nullable=False)
     user_id = Column(String(50), nullable=False)
+    email = Column(String(255), nullable=True)
+    avatar_url = Column(String(255), nullable=False)
 
     # relationship
     files = relationship("File", lazy='select', foreign_keys='File.user_id',
