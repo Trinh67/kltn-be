@@ -2,8 +2,6 @@ import logging
 import time
 from enum import Enum
 from http import HTTPStatus
-from typing import List
-from pyparsing import Optional
 
 import requests
 from app.adapter.base import detect_slow_call

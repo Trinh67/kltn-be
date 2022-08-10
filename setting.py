@@ -29,6 +29,7 @@ class Setting(BaseSettings):
     # Data Storage
     DATA_STORAGE: str = '../data/minio'
     ELASTIC_SERVICE_API_BASE_URL: str = os.getenv('ELASTIC_SERVICE_API_BASE_URL', 'http://localhost:9200')
+    FACEBOOK_SERVICE_API_BASE_URL: str = os.getenv('FACEBOOK_SERVICE_API_BASE_URL', 'https://graph.facebook.com/v13.0')
 
     # AUTHENTICATION
     JWT_ALGORITHM: str = "HS256"

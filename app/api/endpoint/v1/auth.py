@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.dto.core.auth import TokenDTO, LoginGoogleDTO, ExchangeAccessTokenDTO, UserDTO
+from app.dto.core.auth import TokenDTO, LoginDTO, ExchangeAccessTokenDTO, UserDTO
 from app.helper.base_response import DataResponse
 from app.helper.db import db_session
 from app.helper.middleware import get_current_user
@@ -11,8 +11,14 @@ router = APIRouter()
 
 
 @router.post('/login-google', response_model=DataResponse[TokenDTO])
-def login_with_google(login_google_dto: LoginGoogleDTO, db: Session = Depends(db_session)):
+def login_with_google(login_google_dto: LoginDTO, db: Session = Depends(db_session)):
     data = AuthService.login_with_google(db, login_google_dto.token_id)
+    return DataResponse().success_response(data)
+
+
+@router.post('/login-facebook', response_model=DataResponse[TokenDTO])
+def login_with_facebook(login_facebook_dto: LoginDTO, db: Session = Depends(db_session)):
+    data = AuthService.login_with_facebook(db, login_facebook_dto.token_id)
     return DataResponse().success_response(data)
 
 

@@ -29,7 +29,7 @@ def get_current_user(
 
     token_data = TokenData(**get_pay_load(token))
 
-    user = User.q(db, User.email == token_data.sub).first()
+    user = User.q(db, User.user_id == token_data.sub).first()
 
     if not user:
         raise UnauthorizedException

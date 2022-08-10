@@ -4,7 +4,7 @@ from typing import Optional, List
 from app.dto.base import CamelBaseModel
 
 
-class LoginGoogleDTO(CamelBaseModel):
+class LoginDTO(CamelBaseModel):
     token_id: str
 
 
@@ -27,3 +27,8 @@ class UserDTO(CamelBaseModel):
         orm_mode = True
 
 
+class FacebookUserResponse(CamelBaseModel):
+    id: Optional[int]
+    name: Optional[str]
+    email: Optional[str]
+    avatar_url: Optional[str]

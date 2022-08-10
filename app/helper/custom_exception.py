@@ -108,6 +108,12 @@ class ElasticServiceCallException(CommonException):
                                                                   vi=f"Gọi sang Elastic {api_url} thất bại"))
 
 
+class FacebookServiceCallException(CommonException):
+    def __init__(self, api_url: Optional[str]):
+        super().__init__(http_code=500, code=502, message=Message(en=f"Failed to call Facebook Service {api_url}",
+                                                                  vi=f"Gọi sang Facebook {api_url} thất bại"))
+
+
 def translate_message(field_name: str, lang: str) -> str:
     if data_mapping[lang].get(field_name):
         return data_mapping[lang][field_name]
