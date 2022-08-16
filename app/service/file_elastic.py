@@ -1,5 +1,4 @@
 import logging
-from unicodedata import category
 import docx2txt
 import pdfplumber
 from docx2pdf import convert
@@ -8,12 +7,12 @@ from sqlalchemy.orm import Session
 from app.adapter.elastic import ElasticService
 from app.dto.core.file import GetFileDBResponse, SearchFileMappingResponse
 
-from app.dto.core.file_elastic import CreateFileRequest, CreateFileResponse, SearchFileRequest
-from app.helper.constant import Constant
-from app.helper.custom_exception import ElasticServiceCallException, InvalidFileFormat, ObjectNotFound
-from app.helper.paging import Pagination
-from app.model.file import File
 from setting import setting
+from app.model.file import File
+from app.helper.constant import Constant
+from app.helper.paging import Pagination
+from app.helper.custom_exception import ElasticServiceCallException, InvalidFileFormat
+from app.dto.core.file_elastic import CreateFileRequest, CreateFileResponse, SearchFileRequest
 
 _logger = logging.getLogger(__name__)
 
@@ -21,8 +20,8 @@ DATA_PATH = setting.DATA_STORAGE
 
 class FileElasticService:
     @classmethod
-    def create_file(cls, db: Session, request_input: CreateFileRequest):
-        file_path = f'{DATA_PATH}/{request_input.user_id}/{request_input.file_path}'
+    def create_file(cls, db: Session, request_input: CreateFileRequest, user_id: int):
+        file_path = f'{DATA_PATH}/{user_id}/{request_input.file_path}'
         num_pages = 0
 
         try:
@@ -59,7 +58,7 @@ class FileElasticService:
             db.commit()
         except Exception as e:
             _logger.exception(e)
-            raise ObjectNotFound(request_input.file_path)
+            raise ElasticServiceCallException('api create new file')
 
 
         return CreateFileResponse(new_file_id = new_file.id)

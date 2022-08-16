@@ -2,9 +2,11 @@ import logging
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.dto.base import OpenApiResponseModel
+from app.dto.core.auth import UserDTO
 from app.dto.core.file import SearchFileMappingResponse
 from app.helper.base_response import DataResponse, PagingDataResponse
 from app.helper.db import db_session
+from app.helper.middleware import get_current_user
 from app.service.file_elastic import FileElasticService
 from app.util.openapi import map_resp_to_openapi
 
@@ -26,8 +28,8 @@ _logger = logging.getLogger(__name__)
              ]))
 def create_file(db: Session = Depends(db_session),
                                   *,
-                                  request_input: CreateFileRequest):
-    data = FileElasticService.create_file(db, request_input=request_input)
+                                  request_input: CreateFileRequest, user: UserDTO = Depends(get_current_user)):
+    data = FileElasticService.create_file(db, request_input=request_input, user_id=user.id)
     return DataResponse().success_response(data=data)
 
 

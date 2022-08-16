@@ -32,7 +32,6 @@ class CreateFileRequest(CamelBaseModel):
     file_title: str
     file_description: str
     category_id: int
-    user_id: Optional[int] = 3
 
     @validator('file_path')
     def validate_file_path(cls, value):
