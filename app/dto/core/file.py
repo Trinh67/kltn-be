@@ -5,6 +5,7 @@ from unicodedata import category
 from pydantic import Field, root_validator
 from app.dto.base import CamelBaseModel
 from app.dto.core.pagination import PaginationResponse
+from app.helper.enum import FileStatus
 
 
 class FileDTO(CamelBaseModel):
@@ -22,6 +23,7 @@ class FileDTO(CamelBaseModel):
     updated_at: Union[int, datetime]
     type: Optional[str]
     google_driver_id: Optional[str]
+    status: FileStatus
 
     @root_validator()
     def validate_duration(cls, values):

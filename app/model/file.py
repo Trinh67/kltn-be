@@ -1,3 +1,4 @@
+from typing import Collection
 from sqlalchemy import Column, Integer, String, Text
 
 from app.model.base import BareBaseModel
@@ -17,6 +18,7 @@ class File(BareBaseModel):
     file_elastic_id = Column(Text(255), nullable=True)
     file_title = Column(Text(255), nullable=True)
     google_driver_id = Column(Text(50), nullable=True)
+    status = Column(Integer, nullable=False, default=0)
 
     #relationship
     users = relationship("User", foreign_keys='File.user_id',

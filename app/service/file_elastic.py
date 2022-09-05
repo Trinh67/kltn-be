@@ -46,7 +46,7 @@ class FileElasticService:
                 raise InvalidFileFormat
             
             request_model_dict = {
-                "user_id": request_input.user_id,
+                "user_id": user_id,
                 "file_name": request_input.file_path,
                 "file_title": request_input.file_title,
                 "file_description": request_input.file_description,
