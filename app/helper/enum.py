@@ -16,3 +16,6 @@ class FileStatus(IntEnum):
     DRAFT = 1
     REFUSE = 2
     APPROVED = 3
+    UPLOADED = 4
+    LIKED = 5
+    SHARED = 6

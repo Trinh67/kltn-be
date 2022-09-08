@@ -61,9 +61,14 @@ class FileService:
                             .order_by(desc(File.id)) \
                             .all()
         elif type is not None:
-            files = File.q(db, and_(File.user_id == user.id, File.deleted_at.is_(None), File.status == type.value)) \
-                        .join(File.users) \
-                        .order_by(desc(File.id)).all()
+            if type == FileStatus.UPLOADED:
+                files = File.q(db, and_(File.user_id == user.id, File.deleted_at.is_(None))) \
+                            .join(File.users) \
+                            .order_by(desc(File.id)).all()
+            else:
+                files = File.q(db, and_(File.user_id == user.id, File.deleted_at.is_(None), File.status == FileStatus.APPROVED.value)) \
+                            .join(File.users) \
+                            .order_by(desc(File.id)).all()
         else:
             files = File.q(db, and_(File.deleted_at.is_(None), File.user_id == user.id)) \
                         .join(File.users) \
