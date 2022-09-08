@@ -7,6 +7,7 @@ from app.dto.core.common import UploadFileRequest
 from app.dto.core.file import GetFileDBResponse, GetListFileResponse, UploadFileResponse
 from app.helper.base_response import DataResponse, PagingDataResponse
 from app.helper.db import db_session
+from app.helper.enum import FileStatus
 from app.helper.middleware import get_current_user
 from app.service import common_service
 from app.service.file import FileService
@@ -36,4 +37,11 @@ def get_file(db: Session = Depends(db_session),
 def get_list_file(db: Session = Depends(db_session),
                                   *, user_id: Optional[int] = None):
     data, pagination = FileService.get_list_file(db, user_id=user_id)
+    return PagingDataResponse().success_response(data=data, pagination=pagination)
+
+
+@router.get('/filter-file', response_model=PagingDataResponse[GetListFileResponse])
+def filter_file(db: Session = Depends(db_session),
+                                  *, type: Optional[FileStatus] = None, user: Optional[UserDTO] = Depends(get_current_user)):
+    data, pagination = FileService.filter_file(db, user=user, type=type)
     return PagingDataResponse().success_response(data=data, pagination=pagination)
