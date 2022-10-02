@@ -29,7 +29,7 @@ _logger = logging.getLogger(__name__)
 def create_file(db: Session = Depends(db_session),
                                   *,
                                   request_input: CreateFileRequest, user: UserDTO = Depends(get_current_user)):
-    data = FileElasticService.create_file(db, request_input=request_input, user_id=user.id)
+    data = FileElasticService.create_file(db, request_input=request_input, user_id=user.user_id)
     return DataResponse().success_response(data=data)
 
 

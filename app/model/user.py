@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String
+from typing import Text
+from sqlalchemy import Column, Text
 from sqlalchemy.orm import relationship
 
 from app.model.base import BareBaseModel
@@ -7,11 +8,11 @@ from app.model.base import BareBaseModel
 class User(BareBaseModel):
     __tablename__ = 'user'
 
-    name = Column(String(50), nullable=False)
-    user_id = Column(String(50), nullable=False)
-    email = Column(String(255), nullable=True)
-    avatar_url = Column(String(255), nullable=False)
-    source = Column(String(50), nullable=True)
+    name = Column(Text(50), nullable=False)
+    user_id = Column(Text(50), nullable=False)
+    email = Column(Text(255), nullable=True)
+    avatar_url = Column(Text(255), nullable=False)
+    source = Column(Text(50), nullable=True)
 
     # relationship
     files = relationship("File", lazy='select', foreign_keys='File.user_id',

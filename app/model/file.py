@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 class File(BareBaseModel):
     __tablename__ = 'file'
 
-    user_id = Column(Integer, nullable=False)
+    user_id = Column(Text(50), nullable=False)
     category_id = Column(Integer, nullable=False)
     file_name = Column(String(255), nullable=True)
     file_description = Column(Text(255), nullable=True)

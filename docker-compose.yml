@@ -22,7 +22,7 @@ services:
     ports:
       - 9200:9200
     volumes:
-      - C:\Users\trinh\OneDrive\Tài liệu\UET\data\elastic-search
+      - C:\Users\trinh\OneDrive\Tài liệu\UET\kltn\data\elastic-search
 
   kibana:
     container_name: kltn-kibana
@@ -31,3 +31,11 @@ services:
       - ELASTICSEARCH_HOSTS=http://kltn-elasticsearch:9200
     ports:
       - 5601:5601
+  
+  solr:
+    image: solr
+    container_name: solr    
+    ports:
+     - "8983:8983"
+    volumes:
+      - C:\Users\trinh\OneDrive\Tài liệu\UET\kltn\data\solr

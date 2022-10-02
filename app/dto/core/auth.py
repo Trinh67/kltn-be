@@ -18,7 +18,7 @@ class ExchangeAccessTokenDTO(CamelBaseModel):
 
 
 class UserDTO(CamelBaseModel):
-    id: Optional[int]
+    user_id: Optional[int]
     name: Optional[str]
     email: Optional[str]
     avatar_url: Optional[str]
