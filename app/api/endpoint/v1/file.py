@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, File, Form
 from sqlalchemy.orm import Session
 from app.dto.core.auth import UserDTO
 from app.dto.core.common import UploadFileRequest
-from app.dto.core.file import GetFileDBResponse, GetListFileResponse, UploadFileResponse
+from app.dto.core.file import GetFileDBResponse, GetListFileResponse, UpdateStatusFileRequest, UpdateStatusFileResponse, UploadFileResponse
 from app.helper.base_response import DataResponse, PagingDataResponse
 from app.helper.db import db_session
 from app.helper.enum import FileStatus
@@ -45,3 +45,9 @@ def filter_file(db: Session = Depends(db_session),
                                   *, type: Optional[FileStatus] = None, user: Optional[UserDTO] = Depends(get_current_user)):
     data, pagination = FileService.filter_file(db, user=user, type=type)
     return PagingDataResponse().success_response(data=data, pagination=pagination)
+
+
+@router.post('/update-status-file', response_model=DataResponse[UpdateStatusFileResponse])
+def update_status_file(db: Session = Depends(db_session), *, update_status_file_request: UpdateStatusFileRequest, user: Optional[UserDTO] = Depends(get_current_user)):
+    data = FileService.update_status_file(db, user=user, request=update_status_file_request)
+    return DataResponse().success_response(data=data)

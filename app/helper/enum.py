@@ -19,3 +19,4 @@ class FileStatus(IntEnum):
     UPLOADED = 4
     LIKED = 5
     SHARED = 6
+    DELETE = -1

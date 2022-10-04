@@ -50,3 +50,12 @@ class SearchFileMappingResponse(PaginationResponse):
 
 class UploadFileResponse(CamelBaseModel):
     file_name: str = Field(alias="fileName")
+
+
+class UpdateStatusFileRequest(CamelBaseModel):
+    id: int
+    type: FileStatus
+
+
+class UpdateStatusFileResponse(CamelBaseModel):
+    file_id: int

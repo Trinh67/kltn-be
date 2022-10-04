@@ -1,11 +1,13 @@
+from datetime import datetime
 import logging
 from typing import Optional
+from requests import request
 from sqlalchemy import and_, desc
 from sqlalchemy.orm import Session
 from app.adapter.elastic import ElasticService
 from app.dto.core.auth import UserDTO
-from app.dto.core.file import GetFileDBResponse, GetListFileResponse
-from app.helper.custom_exception import ObjectNotFound
+from app.dto.core.file import GetFileDBResponse, GetListFileResponse, UpdateStatusFileRequest, UpdateStatusFileResponse
+from app.helper.custom_exception import InvalidField, ObjectNotFound, PermissionDenied
 from app.helper.enum import FileStatus
 from app.helper.paging import Pagination
 from app.model.file import File
@@ -85,3 +87,27 @@ class FileService:
         
         return GetListFileResponse(files=dto_files), Pagination(total_items=total_files, current_page=1, page_size=100)
 
+    @classmethod
+    def update_status_file(cls, db: Session, request: UpdateStatusFileRequest, user: UserDTO):
+        if user.email != 'trinhxuantrinh.yd267@gmail.com':
+            raise PermissionDenied
+        if request.type not in [FileStatus.APPROVED, FileStatus.REFUSE, FileStatus.DELETE]:
+            raise InvalidField("type")
+        file = File.q(db, and_(File.id == request.id, File.deleted_at.is_(None))).first()
+        if not file:
+            raise ObjectNotFound("File")
+        try:
+            if request.type == FileStatus.DELETE:
+                db.query(File) \
+                    .filter(File.id == request.id) \
+                    .update({"deleted_at": datetime.now(), "status": request.type.value})
+            else:
+                if file.status != FileStatus.DRAFT.value:
+                    raise InvalidField("File")
+                db.query(File) \
+                    .filter(File.id == request.id) \
+                    .update({"status": request.type.value})
+            db.commit()
+            return UpdateStatusFileResponse(file_id = request.id)
+        except Exception as e:
+            _logger.exception(e)
