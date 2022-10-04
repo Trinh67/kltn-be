@@ -55,6 +55,8 @@ class UploadFileResponse(CamelBaseModel):
 class UpdateStatusFileRequest(CamelBaseModel):
     id: int
     type: FileStatus
+    google_driver_id: Optional[str]
+    refuse_reason: Optional[str]
 
 
 class UpdateStatusFileResponse(CamelBaseModel):

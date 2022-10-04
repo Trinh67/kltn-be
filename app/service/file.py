@@ -31,11 +31,11 @@ class FileService:
     @classmethod
     def get_list_file(cls, db: Session, user_id: Optional[int]):
         if user_id:
-            files = File.q(db, and_(File.user_id == user_id, File.deleted_at.is_(None))) \
+            files = File.q(db, and_(File.user_id == user_id, File.deleted_at.is_(None), File.status == FileStatus.APPROVED.value)) \
                         .join(File.users) \
                         .order_by(desc(File.id)).all()
         else:
-            files = File.q(db, File.deleted_at.is_(None)) \
+            files = File.q(db, File.deleted_at.is_(None), File.status == FileStatus.APPROVED.value) \
                         .join(File.users) \
                         .order_by(desc(File.id)) \
                         .all()
@@ -104,9 +104,14 @@ class FileService:
             else:
                 if file.status != FileStatus.DRAFT.value:
                     raise InvalidField("File")
-                db.query(File) \
-                    .filter(File.id == request.id) \
-                    .update({"status": request.type.value})
+                if request.type == FileStatus.APPROVED:
+                    db.query(File) \
+                        .filter(File.id == request.id) \
+                        .update({"status": request.type.value, "google_driver_id": request.google_driver_id})
+                else:
+                    db.query(File) \
+                        .filter(File.id == request.id) \
+                        .update({"status": request.type.value, "refuse_reason": request.refuse_reason})
             db.commit()
             return UpdateStatusFileResponse(file_id = request.id)
         except Exception as e:

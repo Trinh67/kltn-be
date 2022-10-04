@@ -6,6 +6,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from app.adapter.elastic import ElasticService
 from app.dto.core.file import GetFileDBResponse, SearchFileMappingResponse
+from app.helper.enum import FileStatus
 
 from setting import setting
 from app.model.file import File
@@ -52,7 +53,8 @@ class FileElasticService:
                 "file_description": request_input.file_description,
                 "category_id": request_input.category_id,
                 "file_elastic_id": data.id,
-                "pages": num_pages
+                "pages": num_pages,
+                "status": FileStatus.DRAFT.value
             }
             new_file = File.create(db, request_model_dict)
             db.commit()

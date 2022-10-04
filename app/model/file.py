@@ -19,6 +19,7 @@ class File(BareBaseModel):
     file_title = Column(Text(255), nullable=True)
     google_driver_id = Column(Text(50), nullable=True)
     status = Column(Integer, nullable=False, default=0)
+    refuse_reason = Column(Text(255), nullable=True)
 
     #relationship
     users = relationship("User", foreign_keys='File.user_id',
