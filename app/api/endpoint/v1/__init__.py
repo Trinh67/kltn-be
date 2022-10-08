@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from . import health, file_elastic, file, category, auth
+from . import health, file_elastic, file, category, auth, notification
 
 v1_router = APIRouter()
 
@@ -8,3 +8,4 @@ v1_router.include_router(file_elastic.router, prefix="/elastic-file", tags=['Ela
 v1_router.include_router(file.router, prefix="/file", tags=['File'])
 v1_router.include_router(category.router, prefix="/category", tags=['Category'])
 v1_router.include_router(auth.router, prefix='/auth', tags=['auth'])
+v1_router.include_router(notification.router, prefix='/notification', tags=['Notification'])
