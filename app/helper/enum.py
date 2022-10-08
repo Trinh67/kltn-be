@@ -20,3 +20,10 @@ class FileStatus(IntEnum):
     LIKED = 5
     SHARED = 6
     DELETE = -1
+
+
+class ActionFile(IntEnum):
+    REMOVELIKED = 0
+    LIKED = 1
+    REMOVESHARED = 2
+    SHARED = 3

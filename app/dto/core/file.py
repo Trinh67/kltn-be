@@ -5,7 +5,7 @@ from unicodedata import category
 from pydantic import Field, root_validator
 from app.dto.base import CamelBaseModel
 from app.dto.core.pagination import PaginationResponse
-from app.helper.enum import FileStatus
+from app.helper.enum import FileStatus, ActionFile
 
 
 class FileDTO(CamelBaseModel):
@@ -60,4 +60,14 @@ class UpdateStatusFileRequest(CamelBaseModel):
 
 
 class UpdateStatusFileResponse(CamelBaseModel):
+    file_id: int
+
+
+class ActionFileRequest(CamelBaseModel):
+    id: int
+    type: ActionFile
+    share_to_user_id: Optional[str]
+
+
+class ActionFileResponse(CamelBaseModel):
     file_id: int

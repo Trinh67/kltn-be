@@ -1,17 +1,15 @@
 from datetime import datetime
 import logging
 from typing import Optional
-from requests import request
 from sqlalchemy import and_, desc
 from sqlalchemy.orm import Session
 from app.adapter.elastic import ElasticService
 from app.dto.core.auth import UserDTO
-from app.dto.core.file import GetFileDBResponse, GetListFileResponse, UpdateStatusFileRequest, UpdateStatusFileResponse
+from app.dto.core.file import GetFileDBResponse, GetListFileResponse, UpdateStatusFileRequest, UpdateStatusFileResponse, ActionFileRequest
 from app.helper.custom_exception import InvalidField, ObjectNotFound, PermissionDenied
-from app.helper.enum import FileStatus
+from app.helper.enum import ActionFile, FileStatus
 from app.helper.paging import Pagination
-from app.model.file import File
-from app.model.user import User
+from app.model import Shared, Favorite, File, User
 
 from setting import setting
 
@@ -119,6 +117,45 @@ class FileService:
                     db.query(File) \
                         .filter(File.id == request.id) \
                         .update({"status": request.type.value, "refuse_reason": request.refuse_reason})
+            db.commit()
+            return UpdateStatusFileResponse(file_id = request.id)
+        except Exception as e:
+            _logger.exception(e)
+    
+    @classmethod
+    def action_file(cls, db: Session, request: ActionFileRequest, user: UserDTO):
+        file = File.q(db, and_(File.id == request.id, File.deleted_at.is_(None))).first()
+        if not file:
+            raise ObjectNotFound("File")
+        if file.status not in [FileStatus.APPROVED.value]:
+            raise InvalidField("Id")
+        
+        try:
+            if request.type == ActionFile.REMOVELIKED.value:
+                db.query(Favorite) \
+                    .filter(and_(Favorite.file_id == request.id, Favorite.user_id == user.user_id)) \
+                    .update({"deleted_at": datetime.now()})
+            if request.type == ActionFile.REMOVESHARED.value:
+                if file.user_id != user.user_id:
+                    raise ObjectNotFound("File")
+                db.query(Shared) \
+                    .filter(and_(Shared.file_id == request.id, Shared.from_user_id == user.user_id, Shared.to_user_id == request.share_to_user_id)) \
+                    .update({"deleted_at": datetime.now()})
+            if request.type == ActionFile.LIKED.value:
+                favorite_dict = {
+                    "user_id": user.user_id,
+                    "file_id": request.id
+                }
+                Favorite.create(db, favorite_dict)
+            if request.type == ActionFile.SHARED.value:
+                if file.user_id != user.user_id:
+                    raise ObjectNotFound("File")
+                share_dict = {
+                    "from_user_id": user.user_id,
+                    "to_user_id": request.share_to_user_id,
+                    "file_id": request.id
+                }
+                Shared.create(db, share_dict)
             db.commit()
             return UpdateStatusFileResponse(file_id = request.id)
         except Exception as e:
