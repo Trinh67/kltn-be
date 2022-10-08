@@ -11,6 +11,7 @@ from app.helper.custom_exception import InvalidField, ObjectNotFound, Permission
 from app.helper.enum import FileStatus
 from app.helper.paging import Pagination
 from app.model.file import File
+from app.model.user import User
 
 from setting import setting
 
@@ -67,9 +68,15 @@ class FileService:
                 files = File.q(db, and_(File.user_id == user.user_id, File.deleted_at.is_(None))) \
                             .join(File.users) \
                             .order_by(desc(File.id)).all()
-            else:
+            if type == FileStatus.LIKED:
+                files = File.q(db, and_(File.deleted_at.is_(None), File.status == FileStatus.APPROVED.value)) \
+                            .join(File.users) \
+                            .join(File.favorites) \
+                            .order_by(desc(File.id)).all()
+            if type == FileStatus.SHARED:
                 files = File.q(db, and_(File.user_id == user.user_id, File.deleted_at.is_(None), File.status == FileStatus.APPROVED.value)) \
                             .join(File.users) \
+                            .join(User.shareds) \
                             .order_by(desc(File.id)).all()
         else:
             files = File.q(db, and_(File.deleted_at.is_(None), File.user_id == user.user_id)) \

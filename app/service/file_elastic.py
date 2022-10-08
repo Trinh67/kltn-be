@@ -78,7 +78,7 @@ class FileElasticService:
     @classmethod
     def search_content(cls, db: Session, request_input: SearchFileRequest):
         filter_ids = ElasticService.search_content(request_input.content, request_input.size).files
-        files = File.q(db, and_(File.file_elastic_id.in_(filter_ids), File.deleted_at.is_(None))) \
+        files = File.q(db, and_(File.file_elastic_id.in_(filter_ids), File.status == FileStatus.APPROVED, File.deleted_at.is_(None))) \
                     .join(File.users) \
                     .all()
         total_files = len(files)
