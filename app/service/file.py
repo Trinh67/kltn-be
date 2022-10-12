@@ -6,7 +6,7 @@ from sqlalchemy import and_, desc
 from sqlalchemy.orm import Session, contains_eager
 from app.adapter.elastic import ElasticService
 from app.dto.core.auth import UserDTO
-from app.dto.core.file import GetFileDBResponse, GetListFileResponse, UpdateStatusFileRequest, UpdateStatusFileResponse, ActionFileRequest
+from app.dto.core.file import GetFileDBResponse, GetListFileResponse, SharedListRequest, SharedListResponse, UpdateStatusFileRequest, UpdateStatusFileResponse, ActionFileRequest
 from app.helper.custom_exception import InvalidField, ObjectNotFound, PermissionDenied
 from app.helper.enum import ActionFile, FileStatus
 from app.helper.paging import Pagination
@@ -170,3 +170,20 @@ class FileService:
             return UpdateStatusFileResponse(file_id = request.id)
         except Exception as e:
             _logger.exception(e)
+    
+    @classmethod
+    def get_shared_list(cls, db: Session, request: SharedListRequest, user: UserDTO):
+        emails = db.query(User) \
+                    .join(Shared,
+                        and_(Shared.deleted_at.is_(None),
+                            Shared.to_user_id == User.user_id),
+                        isouter=True
+                    ) \
+                    .filter(
+                        Shared.file_id == request.file_id,
+                        Shared.from_user_id == user.user_id) \
+                    .order_by(desc(User.id)).distinct().all()
+        list_emails = []
+        for email in emails:
+            list_emails.append(email.email)
+        return SharedListResponse(emails=list_emails)

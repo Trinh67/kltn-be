@@ -72,3 +72,11 @@ class ActionFileRequest(CamelBaseModel):
 
 class ActionFileResponse(CamelBaseModel):
     file_id: int
+
+
+class SharedListRequest(CamelBaseModel):
+    file_id: int
+
+
+class SharedListResponse(CamelBaseModel):
+    emails: List[str]
