@@ -96,12 +96,8 @@ class ElasticService:
     
     @classmethod
     def search_content(cls, content: str, size: int = 5) -> SearchFileResponse:
-
-        try:
-            resp = cls.call(
-                method='GET',
-                url_path=f'/document/_search/',
-                json_data={
+        parse_content = content.split('"')
+        json_data = {
                     "query": {
                         "bool": {
                             "should": [
@@ -115,6 +111,38 @@ class ElasticService:
                     },
                     "size": size
                 }
+        if len(parse_content) > 1:
+            json_data = {
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "match": {
+                                    "content": parse_content[1]
+                                }
+                            }
+                        ],
+                        "should": [
+                            {
+                                "match": {
+                                    "content": parse_content[0]
+                                }
+                            },
+                            {
+                                "match": {
+                                    "content": parse_content[2]
+                                }
+                            }
+                        ]
+                    }
+                },
+                "size": size
+            }
+        try:
+            resp = cls.call(
+                method='GET',
+                url_path=f'/document/_search/',
+                json_data=json_data
             )
         except Exception as e:
             _logger.exception(e)
