@@ -1,5 +1,3 @@
-
-
 from typing import List, Optional
 from app.dto.base import CamelBaseModel
 

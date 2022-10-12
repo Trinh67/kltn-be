@@ -1,8 +1,9 @@
 from datetime import datetime
 import logging
 from typing import Optional
+from fastapi import Query
 from sqlalchemy import and_, desc
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, contains_eager
 from app.adapter.elastic import ElasticService
 from app.dto.core.auth import UserDTO
 from app.dto.core.file import GetFileDBResponse, GetListFileResponse, UpdateStatusFileRequest, UpdateStatusFileResponse, ActionFileRequest
@@ -69,12 +70,20 @@ class FileService:
             if type == FileStatus.LIKED:
                 files = File.q(db, and_(File.deleted_at.is_(None), File.status == FileStatus.APPROVED.value)) \
                             .join(File.users) \
-                            .join(File.favorites) \
+                            .join(Favorite,
+                                and_(Favorite.deleted_at.is_(None),
+                                    Favorite.user_id == user.user_id,
+                                    Favorite.file_id == File.id)) \
                             .order_by(desc(File.id)).all()
             if type == FileStatus.SHARED:
-                files = File.q(db, and_(File.user_id == user.user_id, File.deleted_at.is_(None), File.status == FileStatus.APPROVED.value)) \
+                files = db.query(File) \
+                            .filter(and_(File.deleted_at.is_(None), File.status == FileStatus.APPROVED.value)) \
                             .join(File.users) \
-                            .join(User.shareds) \
+                            .join(Shared,
+                                and_(Shared.deleted_at.is_(None),
+                                    Shared.to_user_id == user.user_id,
+                                    Shared.file_id == File.id,
+                                )) \
                             .order_by(desc(File.id)).all()
         else:
             files = File.q(db, and_(File.deleted_at.is_(None), File.user_id == user.user_id)) \
@@ -94,7 +103,7 @@ class FileService:
 
     @classmethod
     def update_status_file(cls, db: Session, request: UpdateStatusFileRequest, user: UserDTO):
-        if user.email != 'trinhxuantrinh.yd267@gmail.com':
+        if request.type != FileStatus.DELETE.value and user.email != 'trinhxuantrinh.yd267@gmail.com':
             raise PermissionDenied
         if request.type not in [FileStatus.APPROVED, FileStatus.REFUSE, FileStatus.DELETE]:
             raise InvalidField("type")
@@ -148,14 +157,15 @@ class FileService:
                 }
                 Favorite.create(db, favorite_dict)
             if request.type == ActionFile.SHARED.value:
-                if file.user_id != user.user_id:
+                if str(file.user_id) != str(user.user_id):
                     raise ObjectNotFound("File")
-                share_dict = {
-                    "from_user_id": user.user_id,
-                    "to_user_id": request.share_to_user_id,
-                    "file_id": request.id
-                }
-                Shared.create(db, share_dict)
+                for to_user_id in request.share_to_user_id:
+                    share_dict = {
+                        "from_user_id": user.user_id,
+                        "to_user_id": to_user_id,
+                        "file_id": request.id
+                    }
+                    Shared.create(db, share_dict)
             db.commit()
             return UpdateStatusFileResponse(file_id = request.id)
         except Exception as e:

@@ -17,6 +17,6 @@ class Shared(BareBaseModel):
                          back_populates="shareds",
                          uselist=False, lazy='select')
     files = relationship("File", foreign_keys='Shared.file_id',
-                         primaryjoin='and_(Shared.file_id == File.id, File.deleted_at.is_(None))',
+                         primaryjoin='and_(Shared.file_id == File.id, File.deleted_at.is_(None), Shared.from_user_id == File.user_id)',
                          back_populates="shareds",
                          uselist=False, lazy='select')

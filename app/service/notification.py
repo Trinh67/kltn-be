@@ -10,9 +10,7 @@ from setting import setting
 
 _logger = logging.getLogger(__name__)
 
-DATA_PATH = setting.DATA_STORAGE
-
-class NotificationService:    
+class NotificationService:
     @classmethod
     def get_list_notification(cls, db: Session, user: UserDTO):
         notifications = Notification.q(db, and_(Notification.user_id == user.user_id, Notification.deleted_at.is_(None))) \

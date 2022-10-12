@@ -24,6 +24,7 @@ class FileDTO(CamelBaseModel):
     type: Optional[str]
     google_driver_id: Optional[str]
     status: FileStatus
+    refuse_reason: Optional[str]
 
     @root_validator()
     def validate_duration(cls, values):
@@ -66,7 +67,7 @@ class UpdateStatusFileResponse(CamelBaseModel):
 class ActionFileRequest(CamelBaseModel):
     id: int
     type: ActionFile
-    share_to_user_id: Optional[str]
+    share_to_user_id: Optional[List[str]]
 
 
 class ActionFileResponse(CamelBaseModel):
