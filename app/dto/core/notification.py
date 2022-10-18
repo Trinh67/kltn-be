@@ -1,4 +1,7 @@
-from typing import List, Optional
+from typing import List, Union
+from datetime import datetime
+
+from sqlalchemy import alias
 from app.dto.base import CamelBaseModel
 
 
@@ -7,9 +10,12 @@ class NotificationDTO(CamelBaseModel):
         orm_mode = True
 
     id: int
-    user_id: str
     content: str
+    created_at: Union[int, datetime]
+
+class NotificationItemResponse(NotificationDTO):
+    pass
 
 
 class GetListNotificationResponse(CamelBaseModel):
-    categories: List[NotificationDTO]
+    notifications: List[NotificationDTO]
