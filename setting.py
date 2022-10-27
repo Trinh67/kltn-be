@@ -38,4 +38,7 @@ class Setting(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 12 * 60 * 7
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 24 * 60 * 7
 
+    # Job
+    UPLOAD_FILE_ELASTIC_SEARCH_SLEEP_TIME: int = os.getenv('UPLOAD_FILE_ELASTIC_SEARCH_SLEEP_TIME', 30)
+
 setting = Setting()
