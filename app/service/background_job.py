@@ -6,10 +6,11 @@ from sqlalchemy import and_, desc, or_
 from sqlalchemy.orm import Session
 from app.adapter.elastic import ElasticService
 from app.helper.constant import Constant
-from app.helper.custom_exception import ElasticServiceCallException, InvalidFileFormat
+from app.helper.custom_exception import InvalidFileFormat
 from app.helper.enum import FileStatus
 
 from app.model.file import File
+from app.model.notification import Notification
 from app.service.file_elastic import DATA_PATH
 from setting import setting
 
@@ -53,10 +54,16 @@ class BackgroundJobService:
                     "status": FileStatus.DRAFT.value
                 }
                 db.query(File).filter(File.id == file.id).update(request_model_dict)
+                # create notification
+                new_notification = {
+                    'user_id': file.user_id,
+                    'is_read': 0,
+                    'content': f'File "{file.file_title}" has done processing!'
+                }
+                Notification.create(db, new_notification)
                 db.commit()
         except Exception as e:
             _logger.exception(e)
-            # raise ElasticServiceCallException('api create new file')
 
         _logger.info('Finish job upload file to Elastic')
         

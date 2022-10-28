@@ -9,6 +9,7 @@ from app.helper.custom_exception import InvalidField, ObjectNotFound, Permission
 from app.helper.enum import ActionFile, FileStatus
 from app.helper.paging import Pagination
 from app.model import Shared, Favorite, File, User
+from app.model.notification import Notification
 
 from setting import setting
 
@@ -120,10 +121,24 @@ class FileService:
                     db.query(File) \
                         .filter(File.id == request.id) \
                         .update({"status": request.type.value, "google_driver_id": request.google_driver_id})
+                    # create notification
+                    new_notification = {
+                        'user_id': file.user_id,
+                        'is_read': 0,
+                        'content': f'File "{file.file_title}" has Approved by Admin!'
+                    }
+                    Notification.create(db, new_notification)
                 else:
                     db.query(File) \
                         .filter(File.id == request.id) \
                         .update({"status": request.type.value, "refuse_reason": request.refuse_reason})
+                    # create notification
+                    new_notification = {
+                        'user_id': file.user_id,
+                        'is_read': 0,
+                        'content': f'File "{file.file_title}" has Refuse by Admin!'
+                    }
+                    Notification.create(db, new_notification)
             db.commit()
             return UpdateStatusFileResponse(file_id = request.id)
         except Exception as e:
@@ -154,6 +169,13 @@ class FileService:
                     "file_id": request.id
                 }
                 Favorite.create(db, favorite_dict)
+                # create notification
+                new_notification = {
+                    'user_id': file.user_id,
+                    'is_read': 0,
+                    'content': f'File "{file.file_title}" has Liked by {user.email}!'
+                }
+                Notification.create(db, new_notification)
             if request.type == ActionFile.SHARED.value:
                 if str(file.user_id) != str(user.user_id):
                     raise ObjectNotFound("File")
@@ -164,6 +186,13 @@ class FileService:
                         "file_id": request.id
                     }
                     Shared.create(db, share_dict)
+                    # create notification
+                    new_notification = {
+                        'user_id': to_user_id,
+                        'is_read': 0,
+                        'content': f'File "{file.file_title}" has Shared to you by {user.email}!'
+                    }
+                    Notification.create(db, new_notification)
             db.commit()
             return UpdateStatusFileResponse(file_id = request.id)
         except Exception as e:
