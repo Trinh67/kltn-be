@@ -26,25 +26,25 @@ class FileElasticService:
         num_pages = 0
 
         try:
-            if request_input.file_path.split('.')[1] in Constant.DOCX_FILE_EXT:
-                # extract text from docx
-                # pdf_file = f'{DATA_PATH}/convert/output.pdf'
-                # convert(file_path, pdf_file)
-                # with pdfplumber.open(pdf_file) as pdf:
-                #     num_pages = len(pdf.pages)
-                content = docx2txt.process(file_path)
-                data = ElasticService.create_file(content)
-            elif request_input.file_path.split('.')[1] in Constant.PDF_FILE_EXT:
-                # extract text from pdf
-                with pdfplumber.open(file_path) as pdf:
-                    num_pages = len(pdf.pages)
-                    content = ''
-                    for i in range(0, num_pages):
-                        page = pdf.pages[i]
-                        content += page.extract_text() + f'--- page {i} ----'
-                    data = ElasticService.create_file(content)
-            else:
-                raise InvalidFileFormat
+            # if request_input.file_path.split('.')[1] in Constant.DOCX_FILE_EXT:
+            #     # extract text from docx
+            #     # pdf_file = f'{DATA_PATH}/convert/output.pdf'
+            #     # convert(file_path, pdf_file)
+            #     # with pdfplumber.open(pdf_file) as pdf:
+            #     #     num_pages = len(pdf.pages)
+            #     content = docx2txt.process(file_path)
+            #     data = ElasticService.create_file(content)
+            # elif request_input.file_path.split('.')[1] in Constant.PDF_FILE_EXT:
+            #     # extract text from pdf
+            #     with pdfplumber.open(file_path) as pdf:
+            #         num_pages = len(pdf.pages)
+            #         content = ''
+            #         for i in range(0, num_pages):
+            #             page = pdf.pages[i]
+            #             content += page.extract_text() + f'--- page {i} ----'
+            #         data = ElasticService.create_file(content)
+            # else:
+            #     raise InvalidFileFormat
             
             request_model_dict = {
                 "user_id": user_id,
@@ -52,9 +52,9 @@ class FileElasticService:
                 "file_title": request_input.file_title,
                 "file_description": request_input.file_description,
                 "category_id": request_input.category_id,
-                "file_elastic_id": data.id,
-                "pages": num_pages,
-                "status": FileStatus.DRAFT.value
+                "file_elastic_id": None,
+                "pages": None,
+                "status": FileStatus.PROCESSING.value
             }
             new_file = File.create(db, request_model_dict)
             db.commit()
@@ -64,7 +64,7 @@ class FileElasticService:
 
 
         return CreateFileResponse(new_file_id = new_file.id)
-    
+
     @classmethod
     def get_file(cls, id: str):
         data = ElasticService.get_file(id)
