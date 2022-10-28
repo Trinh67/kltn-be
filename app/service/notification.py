@@ -21,3 +21,10 @@ class NotificationService:
             notification = NotificationItemResponse(**notification.to_dict())
             list_notifications.append(notification)
         return GetListNotificationResponse(notifications=list_notifications)
+
+    @classmethod
+    def make_all_read(cls, db: Session, user: UserDTO):
+        db.query(Notification).filter(Notification.user_id == user.user_id).update({"is_read": 1})
+        db.commit()
+
+        return None
