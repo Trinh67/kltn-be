@@ -1,12 +1,10 @@
 from datetime import datetime
 import logging
 from typing import Optional
-from fastapi import Query
-from sqlalchemy import and_, desc
-from sqlalchemy.orm import Session, contains_eager
-from app.adapter.elastic import ElasticService
+from sqlalchemy import and_, desc, func
+from sqlalchemy.orm import Session
 from app.dto.core.auth import UserDTO
-from app.dto.core.file import GetFileDBResponse, GetListFileResponse, SharedListRequest, SharedListResponse, UpdateStatusFileRequest, UpdateStatusFileResponse, ActionFileRequest
+from app.dto.core.file import FileStatistic, GetFileDBResponse, GetListFileResponse, SharedListRequest, SharedListResponse, StatisticFileResponse, UpdateStatusFileRequest, UpdateStatusFileResponse, ActionFileRequest
 from app.helper.custom_exception import InvalidField, ObjectNotFound, PermissionDenied
 from app.helper.enum import ActionFile, FileStatus
 from app.helper.paging import Pagination
@@ -187,3 +185,14 @@ class FileService:
         for email in emails:
             list_emails.append(email.email)
         return SharedListResponse(emails=list_emails)
+    
+    @classmethod
+    def get_statistic_file(cls, db: Session, user: UserDTO):
+        files = db.query(File.status, func.count(File.id).label('total')). \
+            filter(File.deleted_at.is_(None), File.user_id == user.user_id). \
+            group_by(File.status).all()
+        list_file = []
+        for file in files:
+            list_file.append(FileStatistic.parse_obj(file))
+
+        return StatisticFileResponse(files=list_file)

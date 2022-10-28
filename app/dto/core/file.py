@@ -80,3 +80,11 @@ class SharedListRequest(CamelBaseModel):
 
 class SharedListResponse(CamelBaseModel):
     emails: List[str]
+
+
+class FileStatistic(CamelBaseModel):
+    total: int
+    status: int
+
+class StatisticFileResponse(CamelBaseModel):
+    files: List[FileStatistic]
