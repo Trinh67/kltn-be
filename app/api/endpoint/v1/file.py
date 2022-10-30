@@ -66,7 +66,7 @@ def get_shared_list(db: Session = Depends(db_session), *, shared_list_request: S
     return DataResponse().success_response(data=data)
 
 
-@router.post('/statistic', response_model=DataResponse[StatisticFileResponse])
+@router.get('/statistic', response_model=DataResponse[StatisticFileResponse])
 def get_statistic_file(db: Session = Depends(db_session), user: UserDTO = Depends(get_current_user)):
     data = FileService.get_statistic_file(db, user)
     return DataResponse().success_response(data=data)
