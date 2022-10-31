@@ -220,8 +220,19 @@ class FileService:
         files = db.query(File.status, func.count(File.id).label('total')). \
             filter(File.deleted_at.is_(None), File.user_id == user.user_id). \
             group_by(File.status).all()
+        files_liked = db.query(func.count(File.id).label('total')) \
+            .join(Favorite, Favorite.file_id == File.id) \
+            .filter(Favorite.deleted_at.is_(None),
+                    Favorite.user_id == user.user_id).all()
+        files_shared = db.query(func.count(File.id).label('total')) \
+            .join(Shared, Shared.file_id == File.id) \
+            .filter(Shared.deleted_at.is_(None),
+                    Shared.to_user_id == user.user_id).all()
         list_file = []
         for file in files:
             list_file.append(FileStatistic.parse_obj(file))
+
+        list_file.append(FileStatistic.parse_obj({"status": 5, "total": files_liked[0].total}))
+        list_file.append(FileStatistic.parse_obj({"status": 6, "total": files_shared[0].total}))
 
         return StatisticFileResponse(files=list_file)
