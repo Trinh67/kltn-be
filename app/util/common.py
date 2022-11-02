@@ -169,4 +169,4 @@ def is_same_dict(dict1: dict, dict2: dict) -> bool:
 
 
 def generate_unique_filename(filename: str):
-    return filename.split('.')[0] + '-' + str(round(time.time() * 1000)) + '.' + filename.split('.')[1]
+    return filename.split('.')[0] + '-' + str(round(time.time() * 1000)) + '.' + filename.split('.')[-1]
