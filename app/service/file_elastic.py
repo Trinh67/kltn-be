@@ -22,9 +22,6 @@ DATA_PATH = setting.DATA_STORAGE
 class FileElasticService:
     @classmethod
     def create_file(cls, db: Session, request_input: CreateFileRequest, user_id: int):
-        file_path = f'{DATA_PATH}/{user_id}/{request_input.file_path}'
-        num_pages = 0
-
         try:
             # if request_input.file_path.split('.')[1] in Constant.DOCX_FILE_EXT:
             #     # extract text from docx
@@ -64,16 +61,6 @@ class FileElasticService:
 
 
         return CreateFileResponse(new_file_id = new_file.id)
-
-    @classmethod
-    def get_file(cls, id: str):
-        data = ElasticService.get_file(id)
-        return data
-    
-    @classmethod
-    def get_list_file(cls, size: int):
-        data = ElasticService.get_list_file(size)
-        return data
     
     @classmethod
     def search_content(cls, db: Session, request_input: SearchFileRequest):

@@ -33,18 +33,6 @@ def create_file(db: Session = Depends(db_session),
     return DataResponse().success_response(data=data)
 
 
-@router.get('/', response_model=DataResponse[GetFileResponse])
-def get_file(id: str):
-    data = FileElasticService.get_file(id=id)
-    return DataResponse().success_response(data=data)
-
-
-@router.get('/list-file', response_model=DataResponse[GetListFileResponse])
-def get_list_file(size: int = 5):
-    data = FileElasticService.get_list_file(size = size)
-    return DataResponse().success_response(data=data)
-
-
 @router.post('/search', response_model=DataResponse[SearchFileMappingResponse])
 def search_content_file(db: Session = Depends(db_session),
                                   *,

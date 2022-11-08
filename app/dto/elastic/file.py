@@ -1,6 +1,5 @@
 
 from typing import List
-from pydantic import Field
 
 from app.dto.base import CamelBaseModel
 

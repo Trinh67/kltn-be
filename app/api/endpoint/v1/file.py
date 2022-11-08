@@ -20,7 +20,6 @@ router = APIRouter()
 _logger = logging.getLogger(__name__)
 
 
-
 @router.post('/upload-file', response_model=DataResponse[UploadFileResponse])
 def upload_document_file(*, upload_file_request: UploadFileRequest = File(...), user: Optional[UserDTO] = Depends(get_current_user)):
     data = common_service.upload_file(user_id=user.user_id ,file=upload_file_request)

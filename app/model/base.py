@@ -44,28 +44,6 @@ class BareBaseModel(Base):
     deleted_at = Column(DateTime, nullable=True)
 
     @classmethod
-    def max(cls, db: Session, field):
-        """
-        Sample: User.max(User.id)
-        :param db:
-        :param field:
-        :return: int, None if no records
-        """
-        return cls.scalar(db, 'max', field)
-
-    @classmethod
-    def scalar(cls, db: Session, _func, field):
-        """
-        Sample: User.scalar('max', User.id)
-        :param _func:
-        :param db:
-        :param field:
-        :return: int, None if no records
-        """
-        func_to_call = getattr(func, _func)
-        return db.query(cls, func_to_call(field)).scalar()
-
-    @classmethod
     def q(cls, db: Session, *criterion):
         """
         Filter by criterion, ex: User.q(User.name=='Thuc', User.status==1)
@@ -77,16 +55,6 @@ class BareBaseModel(Base):
         if criterion:
             return query.filter(*criterion)
         return query
-
-    @classmethod
-    def q_by(cls, db: Session, **kwargs):
-        """
-        Filter by named params, ex: User.q(name='Thuc', status=1)
-        :param db:
-        :param kwargs:
-        :return:
-        """
-        return db.query(cls).filter_by(**kwargs).filter(cls.deleted_at.is_(None))
 
     @classmethod
     def first(cls, db: Session, *criterion):
@@ -107,22 +75,6 @@ class BareBaseModel(Base):
         return res
 
     @classmethod
-    def first_by(cls, db: Session, **kwargs):
-        """
-        Get first by named params, ex: user1 = User.first_by(name='Thuc1')
-        :return:
-        """
-        res = cls.q_by(db, **kwargs).first()
-        return res
-
-    @classmethod
-    def first_by_or_error(cls, db: Session, **kwargs):
-        res = cls.first_by(db, **kwargs)
-        if not res:
-            raise ObjectNotFound(ObjectNotFoundType(cls.__name__))
-        return res
-
-    @classmethod
     def get(cls, db: Session, _id, error_out=False):
         """
         Find model object by id
@@ -136,10 +88,6 @@ class BareBaseModel(Base):
         if not obj and error_out:
             raise ObjectNotFound(ObjectNotFoundType(cls.__name__))
         return obj
-
-    @classmethod
-    def get_or_error(cls, db: Session, _id):
-        return cls.get(db, _id, True)
 
     @classmethod
     def create(cls, db: Session, data, commit=False):
@@ -184,22 +132,3 @@ class BareBaseModel(Base):
             db.commit()
         else:
             db.flush()
-
-    @classmethod
-    def get_logging_payload(cls, db: Session, value):
-        if not hasattr(cls, 'audit_attrs'):
-            return {}
-
-        campaign = db.query(cls).filter(cls.id == value).first()
-        if campaign:
-            audit_log_model = campaign.to_dict()
-            model_attrs = list(audit_log_model.keys())
-            for key in model_attrs:
-                if key not in cls.audit_attrs:
-                    audit_log_model.pop(key)
-                elif isinstance(audit_log_model.get(key), datetime):
-                    audit_log_model[key] = audit_log_model.get(key).strftime('%y-%m-%dT%H:%M:%SZ')
-
-            return audit_log_model
-
-        return {}
