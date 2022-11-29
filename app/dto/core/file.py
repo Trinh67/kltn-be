@@ -45,6 +45,10 @@ class GetListFileResponse(PaginationResponse):
     files: List[GetFileDBResponse]
 
 
+class GetListCategoryFileResponse(PaginationResponse):
+    files: List[GetFileDBResponse]
+
+
 class SearchFileMappingResponse(PaginationResponse):
     files: List[GetFileDBResponse]
 

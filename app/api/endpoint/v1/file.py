@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, File, Form
 from sqlalchemy.orm import Session
 from app.dto.core.auth import UserDTO
 from app.dto.core.common import UploadFileRequest
-from app.dto.core.file import GetFileDBResponse, GetListFileResponse, SharedListRequest, SharedListResponse, StatisticFileResponse, UpdateStatusFileRequest, UpdateStatusFileResponse, \
+from app.dto.core.file import GetFileDBResponse, GetListCategoryFileResponse, GetListFileResponse, SharedListRequest, SharedListResponse, StatisticFileResponse, UpdateStatusFileRequest, UpdateStatusFileResponse, \
      UploadFileResponse, ActionFileRequest, ActionFileResponse
 from app.helper.base_response import DataResponse, PagingDataResponse
 from app.helper.db import db_session
@@ -31,6 +31,13 @@ def get_file(db: Session = Depends(db_session),
                                   *, id: int):
     data = FileService.get_file(db, id=id)
     return DataResponse().success_response(data=data)
+
+
+@router.get('/category', response_model=DataResponse[GetListCategoryFileResponse])
+def get_category_file(db: Session = Depends(db_session),
+                                  *, id: int):
+    data, pagination = FileService.get_category_file(db, id=id)
+    return PagingDataResponse().success_response(data=data, pagination=pagination)
 
 
 @router.get('/list-file', response_model=PagingDataResponse[GetListFileResponse])
