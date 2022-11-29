@@ -1,17 +1,5 @@
 version: '3.7'
 services:
-  minio:
-    container_name: kltn-minio
-    image: minio/minio
-    command: [server, /data]
-    environment:
-      MINIO_ACCESS_KEY: admin
-      MINIO_SECRET_KEY: admin@123
-    ports:
-      - 9002:9002
-    volumes:
-      - C:\Users\trinh\OneDrive\Tài liệu\UET\data\minio
-
   elasticsearch:
     container_name: kltn-elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
@@ -31,11 +19,3 @@ services:
       - ELASTICSEARCH_HOSTS=http://kltn-elasticsearch:9200
     ports:
       - 5601:5601
-  
-  solr:
-    image: solr
-    container_name: solr    
-    ports:
-     - "8983:8983"
-    volumes:
-      - C:\Users\trinh\OneDrive\Tài liệu\UET\kltn\data\solr

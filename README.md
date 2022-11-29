@@ -22,3 +22,10 @@ $ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 To run test
 ```
     py.test --cov=app
+```
+
+
+### Run Job
+```
+    python command.py background-job upload-file-to-elastic-search
+```
